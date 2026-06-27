@@ -1,0 +1,24 @@
+services:
+  web:
+    image: nginx:alpine
+    restart: always
+    networks:
+      - n8n_default
+    command:
+      - /bin/sh
+      - -c
+      - |
+        wget -qO /usr/share/nginx/html/index.html "https://icon98.app.n8n.cloud/webhook/grad/html" || exit 1
+        exec nginx -g 'daemon off;'
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_default
+      - traefik.http.routers.grad.rule=Host(`grad.iconstudio.tech`)
+      - traefik.http.routers.grad.entrypoints=web,websecure
+      - traefik.http.routers.grad.tls=true
+      - traefik.http.routers.grad.tls.certresolver=mytlschallenge
+      - traefik.http.services.grad.loadbalancer.server.port=80
+
+networks:
+  n8n_default:
+    external: true

@@ -1,0 +1,344 @@
+{
+  "name": "Grad Portal API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "grad/data",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "wh-data",
+      "name": "GET /grad/data",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "wh-data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst SEED = [{\"id\": 1, \"t\": \"إن شاء الله خير\", \"dir\": \"محمد رفعت\", \"snd\": \"احمد فؤاد\", \"ed\": \"احمد هلال\", \"dates\": \"24/4 - 26/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 2, \"t\": \"النمرة غلط\", \"dir\": \"مينا سمير\", \"snd\": \"لوجين حاتم\", \"ed\": \"جمانه هنداوي\", \"dates\": \"6/5 - 7/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 3, \"t\": \"19 مارس\", \"dir\": \"عبد الرحمن معتز\", \"snd\": \"—\", \"ed\": \"آيات صبحي\", \"dates\": \"21/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 4, \"t\": \"ليلى\", \"dir\": \"يحي شكري\", \"snd\": \"محمود ياسر\", \"ed\": \"محمد هشام\", \"dates\": \"25/4 - 26/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 5, \"t\": \"نص كفن\", \"dir\": \"مصطفى برديني\", \"snd\": \"احمد سمير\", \"ed\": \"يحيى الشحري\", \"dates\": \"2/5 - 3/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 6, \"t\": \"جزر\", \"dir\": \"منى هشام\", \"snd\": \"يحي محمد\", \"ed\": \"بيتر عادل\", \"dates\": \"5/5\", \"shot\": false, \"idx\": 0, \"foley\": false}, {\"id\": 7, \"t\": \"نسمة هوا\", \"dir\": \"جومانه سيد\", \"snd\": \"صامونيل إيميل\", \"ed\": \"محمد منير ابو المكارم\", \"dates\": \"28/4 - 29/4\", \"shot\": true, \"idx\": 4, \"foley\": true, \"mixStart\": \"7/6\"}, {\"id\": 8, \"t\": \"رايح جاي\", \"dir\": \"يوسف عرفة\", \"snd\": \"لوجين حاتم\", \"ed\": \"مريم جبر\", \"dates\": \"23/4 - 1/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 9, \"t\": \"على معادنا\", \"dir\": \"لينا أبو عبيد\", \"snd\": \"يحي محمد\", \"ed\": \"فواز عثمان\", \"dates\": \"1/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 10, \"t\": \"هابيل\", \"dir\": \"محمد احمد جابر\", \"snd\": \"محمد محمود\", \"ed\": \"عبد الرحمن\", \"dates\": \"23/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 11, \"t\": \"نور عين\", \"dir\": \"نور الحجار\", \"snd\": \"—\", \"ed\": \"مريم باهر\", \"dates\": \"28/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 12, \"t\": \"نقطة تحول\", \"dir\": \"—\", \"snd\": \"عبد الرحمن سند\", \"ed\": \"دينا حسن\", \"dates\": \"27/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 13, \"t\": \"ظل وانعكاس (فيديو قصير)\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"21/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 14, \"t\": \"نحت العمر (تسجيلي)\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"16/4 - 17/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 15, \"t\": \"ألوان الدرب الأحمر (تسجيلي)\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"29/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 16, \"t\": \"فيلم / ظرف ثانوي\", \"dir\": \"—\", \"snd\": \"عبد الرحمن احمد\", \"ed\": \"عرفات مهدي\", \"dates\": \"23/4\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 17, \"t\": \"فيلم / اختيار\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"يوسف الشريف\", \"dates\": \"4/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 18, \"t\": \"فيلم / ليان\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"20/5 - 21/5\", \"shot\": false, \"idx\": 0, \"foley\": false}, {\"id\": 19, \"t\": \"فيلم / محطة أخيرة\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"15/5\", \"shot\": false, \"idx\": 0, \"foley\": false}, {\"id\": 20, \"t\": \"فيلم / رتوش\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"14/5 - 15/5\", \"shot\": false, \"idx\": 0, \"foley\": false}, {\"id\": 21, \"t\": \"فيلم المقبرة (تسجيلي)\", \"dir\": \"—\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"9/5\", \"shot\": true, \"idx\": 2, \"foley\": false}, {\"id\": 22, \"t\": \"شجر المشمش\", \"dir\": \"يارا حجاج\", \"snd\": \"—\", \"ed\": \"—\", \"dates\": \"—\", \"shot\": false, \"idx\": 0, \"foley\": false}];\nconst PROFESSORS = [{\"name\": \"سلمى الباروني\", \"phone\": \"+201277508992\"}, {\"name\": \"إيهاب أمين\", \"phone\": \"+201226609798\"}, {\"name\": \"دارين\", \"phone\": \"+201224851343\"}, {\"name\": \"فيروز طارق\", \"phone\": \"+201146655510\"}];\nif (!sd.initialized) {\n  sd.projects = JSON.parse(JSON.stringify(SEED));\n  sd.professors = PROFESSORS;\n  sd.bookings = [];\n  sd.initialized = true;\n}\nreturn [{ json: { projects: sd.projects, professors: sd.professors, bookings: sd.bookings } }];"
+      },
+      "id": "code-data",
+      "name": "Load Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "resp-data",
+      "name": "Respond Data",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "grad/update",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "wh-update",
+      "name": "POST /grad/update",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        560
+      ],
+      "webhookId": "wh-update"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst body = $json.body || $json;\nconst MIX_IDX = 4;\nconst FOLEY_IDX = 2;\nconst p = (sd.projects || []).find(x => x.id === body.projectId);\nif (!p) throw new Error('Project not found');\nif (body.action === 'advance') {\n  if (p.idx + 1 === MIX_IDX && !p.foley) throw new Error('Foley review required before final mix');\n  if (p.idx >= 6) return [{ json: { ok: true, skipped: true } }];\n  p.idx++;\n  if (p.idx > 0) p.shot = true;\n  if (p.idx === MIX_IDX && !p.mixStart) {\n    const d = new Date();\n    p.mixStart = `${d.getDate()}/${d.getMonth() + 1}`;\n  }\n}\nif (body.action === 'foley_confirm') {\n  if (p.idx < FOLEY_IDX) throw new Error('Not at foley stage yet');\n  p.foley = true;\n}\nconst msg = `📢 تحديث مشروع «${body.project}»\\n👤 ${body.student}\\n${body.fromStage} → ${body.toStage}${body.note ? '\\n📝 ' + body.note : ''}`;\nreturn [{ json: { ok: true, notifyMessage: msg, notifyPhones: (sd.professors || []).map(x => x.phone) } }];"
+      },
+      "id": "code-update",
+      "name": "Process Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true } }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "resp-update",
+      "name": "Respond Update",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "grad/booking",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "wh-booking",
+      "name": "POST /grad/booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        820
+      ],
+      "webhookId": "wh-booking"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst body = $json.body || $json;\nif (!sd.bookings) sd.bookings = [];\nconst clash = sd.bookings.find(b => b.date === body.date && b.slot === body.slot);\nif (clash) return [{ json: { clash: true, id: null } }];\nconst p = (sd.projects || []).find(x => x.id === body.projectId);\nif (body.purpose && body.purpose.includes('المكساج') && p && !p.foley) {\n  throw new Error('Foley review required before mix booking');\n}\nconst id = 'BK' + Math.floor(1000 + Math.random() * 9000);\nsd.bookings.push({ id, projectId: body.projectId, project: body.project, student: body.student, phone: body.phone || '', date: body.date, slot: body.slot, purpose: body.purpose, supervisor: null });\nconst msg = `🎙️ حجز استوديو جديد\\n📽 ${body.project} — ${body.student}\\n📅 ${body.date} | ${body.slot}\\n🎯 ${body.purpose}`;\nreturn [{ json: { id, clash: false, notifyMessage: msg, notifyPhones: (sd.professors || []).map(x => x.phone) } }];"
+      },
+      "id": "code-booking",
+      "name": "Process Booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "resp-booking",
+      "name": "Respond Booking",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "grad/claim",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "wh-claim",
+      "name": "POST /grad/claim",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        1080
+      ],
+      "webhookId": "wh-claim"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst body = $json.body || $json;\nconst b = (sd.bookings || []).find(x => x.id === body.bookingId);\nif (!b) throw new Error('Booking not found');\nif (b.supervisor) return [{ json: { taken: true, supervisor: b.supervisor } }];\nb.supervisor = body.professor;\nconst msg = `✅ تم تسجيل الإشراف\\n👨‍🏫 ${body.professor}\\n📽 ${b.project}\\n📅 ${b.date} | ${b.slot}`;\nreturn [{ json: { taken: false, ok: true, notifyMessage: msg, studentPhone: b.phone || '' } }];"
+      },
+      "id": "code-claim",
+      "name": "Process Claim",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1080
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { taken: $json.taken || false, ok: $json.ok || false } }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "id": "resp-claim",
+      "name": "Respond Claim",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        1080
+      ]
+    }
+  ],
+  "connections": {
+    "GET /grad/data": {
+      "main": [
+        [
+          {
+            "node": "Load Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Data": {
+      "main": [
+        [
+          {
+            "node": "Respond Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST /grad/update": {
+      "main": [
+        [
+          {
+            "node": "Process Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Update": {
+      "main": [
+        [
+          {
+            "node": "Respond Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST /grad/booking": {
+      "main": [
+        [
+          {
+            "node": "Process Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Booking": {
+      "main": [
+        [
+          {
+            "node": "Respond Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST /grad/claim": {
+      "main": [
+        [
+          {
+            "node": "Process Claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Claim": {
+      "main": [
+        [
+          {
+            "node": "Respond Claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "grad-portal-v1",
+  "meta": {
+    "instanceId": "icon98.app.n8n.cloud"
+  },
+  "tags": []
+}

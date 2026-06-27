@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مشروعات التخرج 2026 — المعهد العالي للسينما</title>
+<style>
+  :root{
+    --navy:#0e1a2b; --navy2:#13233a; --card:#172a44; --line:#24405f;
+    --gold:#d4a843; --cyan:#3fc1c9; --txt:#eaf1f8; --mut:#9db3c8;
+    --ok:#3ec97e; --warn:#e8b339; --bad:#e35d5d; --purple:#9b6dd6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+  body{background:var(--navy);color:var(--txt);min-height:100vh}
+  header{background:linear-gradient(135deg,var(--navy2),var(--navy));border-bottom:2px solid var(--gold);padding:16px 22px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+  header h1{font-size:1.15rem;color:var(--gold)}
+  header h1 span{color:var(--cyan);font-weight:400;font-size:.85rem;display:block;margin-top:2px}
+  .hstats{display:flex;gap:8px;flex-wrap:wrap}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 14px;font-size:.78rem;color:var(--mut);text-align:center}
+  .stat b{display:block;font-size:1.15rem}
+  .s-ok b{color:var(--ok)}.s-warn b{color:var(--warn)}.s-bad b{color:var(--bad)}.s-day b{color:var(--cyan)}
+  nav{display:flex;gap:6px;padding:14px 22px 0;flex-wrap:wrap}
+  nav button{background:var(--card);color:var(--mut);border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 18px;cursor:pointer;font-size:.92rem}
+  nav button.active{background:var(--navy2);color:var(--gold);border-color:var(--gold)}
+  main{padding:20px 22px;max-width:1280px;margin:0 auto}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .card h3{color:var(--cyan);font-size:1rem;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line)}
+  th{color:var(--gold);font-weight:600;white-space:nowrap}
+  tr:hover td{background:rgba(63,193,201,.06)}
+  .chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;white-space:nowrap}
+  .c-ok{background:rgba(62,201,126,.15);color:var(--ok);border:1px solid var(--ok)}
+  .c-warn{background:rgba(232,179,57,.15);color:var(--warn);border:1px solid var(--warn)}
+  .c-bad{background:rgba(227,93,93,.15);color:var(--bad);border:1px solid var(--bad)}
+  .c-mix{background:rgba(155,109,214,.15);color:var(--purple);border:1px solid var(--purple)}
+  .c-info{background:rgba(63,193,201,.12);color:var(--cyan);border:1px solid var(--cyan)}
+  .bar{background:var(--navy);border-radius:8px;height:7px;overflow:hidden;min-width:64px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold))}
+  label{display:block;color:var(--mut);font-size:.82rem;margin:10px 0 4px}
+  select,input,textarea{width:100%;background:var(--navy);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:10px;font-size:.9rem;font-family:inherit}
+  select:focus,input:focus,textarea:focus{outline:none;border-color:var(--cyan)}
+  .btn{background:linear-gradient(135deg,var(--gold),#b8902f);color:#1a1a1a;border:none;border-radius:8px;padding:11px 22px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:14px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.alt{background:linear-gradient(135deg,var(--cyan),#2a9aa1);color:#fff}
+  .note{font-size:.76rem;color:var(--mut);margin-top:6px;line-height:1.6}
+  .alertbox{border:1px solid var(--bad);background:rgba(227,93,93,.1);color:var(--bad);border-radius:8px;padding:8px 12px;font-size:.8rem;margin-top:8px;display:none}
+  .toast{position:fixed;bottom:20px;right:50%;transform:translateX(50%);background:var(--card);border:1px solid var(--cyan);border-radius:10px;padding:12px 22px;font-size:.9rem;display:none;z-index:99;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90vw;text-align:center}
+  .booking-item{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--navy2)}
+  .booking-item .meta{font-size:.84rem;line-height:1.8}
+  .booking-item .meta b{color:var(--gold)}
+  .tag-need{color:var(--bad);font-size:.76rem;border:1px dashed var(--bad);border-radius:20px;padding:2px 10px}
+  .tag-have{color:var(--ok);font-size:.76rem;border:1px solid var(--ok);border-radius:20px;padding:2px 10px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:780px){.two{grid-template-columns:1fr}}
+  #liveBanner{background:rgba(232,179,57,.12);border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:8px 14px;font-size:.78rem;margin-bottom:14px;text-align:center;display:none}
+  .pipeline{display:flex;gap:4px;flex-wrap:wrap;font-size:.68rem;margin-top:4px}
+  .pipeline span{padding:2px 8px;border-radius:12px;border:1px solid var(--line);color:var(--mut)}
+  .pipeline span.done{border-color:var(--ok);color:var(--ok)}
+  .pipeline span.cur{border-color:var(--gold);color:var(--gold);font-weight:700}
+  footer{text-align:center;color:var(--mut);font-size:.7rem;padding:18px;border-top:1px solid var(--line);margin-top:30px;line-height:1.8}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎬 مشروعات التخرج 2026 — متابعة ما بعد الإنتاج <span>لجنة الإشراف على تنفيذ مشروعات التخرج · المعهد العالي للسينما — أكاديمية الفنون</span></h1>
+  <div class="hstats">
+    <div class="stat s-day"><b id="days">--</b>يوم حتى التحكيم 30/6</div>
+    <div class="stat s-ok"><b id="stReady">0</b>جاهز للتحكيم</div>
+    <div class="stat s-warn"><b id="stActive">0</b>قيد التنفيذ</div>
+    <div class="stat s-bad"><b id="stShoot">0</b>تصوير غير مكتمل</div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" data-p="projects">📋 المشاريع</button>
+  <button data-p="update">✏️ تحديث مرحلة</button>
+  <button data-p="booking">🎙️ حجز استوديو الفولي</button>
+  <button data-p="board">👨‍🏫 لوحة الإشراف</button>
+  <a href="dashboard.html" style="margin-right:auto;background:var(--card);color:var(--cyan);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:.92rem;text-decoration:none">📊 التقرير التفاعلي</a>
+</nav>
+
+<main>
+  <div id="liveBanner">⚠️ وضع غير متصل — التعديلات محلية فقط ولن تُرسل إشعارات حتى الاتصال بالخادم</div>
+
+  <section class="panel active" id="p-projects">
+    <div class="card">
+      <h3>الأفلام الـ22 — الحالة حتى آخر تحديث</h3>
+      <div style="overflow-x:auto">
+        <table id="projTable">
+          <thead><tr>
+            <th>م</th><th>المشروع</th><th>إخراج</th><th>صوت</th><th>مونتاج</th>
+            <th>تواريخ التصوير</th><th>التصوير</th><th>مراجعة الفولي</th><th>المرحلة الحالية</th><th>التقدّم</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="note">مسار الاعتماد الإجباري: تصوير ← مونتاج ← الفولي ← مراجعة استيريو ← المكساج النهائي (دولبي) ← DCP ← جاهز للتحكيم. لا يُسمح بتخطي مرحلة.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="p-update">
+    <div class="card" style="max-width:580px;margin:0 auto">
+      <h3>تحديث مرحلة المشروع — يصل إشعار فوري للمشرف</h3>
+      <label>المشروع</label><select id="uProject"></select>
+      <div class="pipeline" id="uPipe"></div>
+      <label>اسم الطالب (للتوثيق)</label><input id="uStudent" placeholder="اكتب اسمك">
+      <label>الإجراء</label>
+      <select id="uAction">
+        <option value="advance">إنهاء المرحلة الحالية والانتقال للتالية</option>
+        <option value="foley_confirm">تأكيد مراجعة الفولي ✔</option>
+        <option value="note">إضافة ملاحظة فقط</option>
+      </select>
+      <label>ملاحظات (اختياري)</label><textarea id="uNote" rows="2"></textarea>
+      <div class="alertbox" id="uAlert"></div>
+      <button class="btn" id="uSend">إرسال التحديث</button>
+      <p class="note">⛔ قاعدة اللجنة: لا يمكن الانتقال إلى المكساج النهائي قبل تأكيد مراجعة الفولي. النظام يفرض الترتيب آليًا ويُسجّل اسم من قام بالتحديث.</p>
+    </div>
+  </section>
+
+  <section class="panel" id="p-booking">
+    <div class="two">
+      <div class="card">
+        <h3>حجز جديد — قبل الموعد بـ48 ساعة على الأقل</h3>
+        <label>المشروع</label><select id="bProject"></select>
+        <label>اسم الطالب</label><input id="bStudent" placeholder="اكتب اسمك">
+        <label>رقم هاتف الطالب</label><input id="bPhone" placeholder="01xxxxxxxxx" inputmode="tel">
+        <label>الغرض</label>
+        <select id="bPurpose">
+          <option value="foley">تسجيل فولي</option>
+          <option value="stereo">مراجعة في الاستوديو الاستيريو</option>
+          <option value="mix">المكساج النهائي (دولبي)</option>
+        </select>
+        <label>التاريخ</label><input type="date" id="bDate">
+        <label>الفترة</label>
+        <select id="bSlot">
+          <option>9:00 – 12:00 صباحًا</option>
+          <option>12:00 – 3:00 ظهرًا</option>
+          <option>3:00 – 6:00 مساءً</option>
+        </select>
+        <div class="alertbox" id="bAlert"></div>
+        <button class="btn" id="bSend">تأكيد الحجز</button>
+        <p class="note">عند التأكيد يُبلَّغ جميع أساتذة اللجنة بالموعد، وأول أستاذ متاح يسجّل نزوله للإشراف. حجز «المكساج النهائي» يتطلب تأكيد مراجعة الفولي مسبقًا — قاعدة اللجنة.</p>
+      </div>
+      <div class="card">
+        <h3>الحجوزات القادمة</h3>
+        <div id="bookList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-board">
+    <div class="card">
+      <h3>حجوزات تحتاج مشرفًا — أول من يسجّل يثبت الإشراف باسمه</h3>
+      <div id="claimList"></div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+<footer>المعهد العالي للسينما — أكاديمية الفنون © 2026<br>قسم هندسة الصوت · وحدة الذكاء الاصطناعي — مبني على جدول «تنفيذ مشروعات التخرج 2026» المعتمد من لجنة الإشراف</footer>
+
+<script>
+const CONFIG = {
+  N8N_BASE: "https://icon98.app.n8n.cloud/webhook/grad",
+  MIN_HOURS: 48,
+  JURY_DATE: "2026-06-30"
+};
+
+const STAGES = ["تصوير","مونتاج","الفولي","مراجعة استيريو","المكساج النهائي","DCP","جاهز للتحكيم"];
+const MIX_IDX = 4;
+const FOLEY_IDX = 2;
+
+const SEED = [
+ {id:1, t:"إن شاء الله خير", dir:"محمد رفعت", snd:"احمد فؤاد", ed:"احمد هلال", dates:"24/4 - 26/4", shot:true, idx:4, foley:false, mixStart:"6/6"},
+ {id:2, t:"النمرة غلط", dir:"مينا سمير", snd:"لوجين حاتم", ed:"جمانه هنداوي", dates:"6/5 - 7/5", shot:true, idx:2, foley:false},
+ {id:3, t:"19 مارس", dir:"عبد الرحمن معتز", snd:"ع", ed:"آيات صبحي", dates:"21/4", shot:true, idx:2, foley:false},
+ {id:4, t:"ليلى", dir:"يحي شكري", snd:"محمود ياسر", ed:"محمد هشام", dates:"25/4 - 26/4", shot:true, idx:4, foley:false, mixStart:"6/6"},
+ {id:5, t:"نص كفن", dir:"مصطفى برديني", snd:"احمد سمير", ed:"يحيى الشحري", dates:"2/5 - 3/5", shot:true, idx:2, foley:false},
+ {id:6, t:"جزر", dir:"منى هشام", snd:"يحيى الهرميل", ed:"بيتر عادل", dates:"5/5", shot:true, idx:2, foley:false},
+ {id:7, t:"نسمة هوا", dir:"جومانه سيد", snd:"صمونيل إميل", ed:"محمد منير ابو المكارم", dates:"28/4 - 29/4", shot:true, idx:4, foley:true, mixStart:"7/6"},
+ {id:8, t:"رايح جاي", dir:"يوسف عرفة", snd:"لوجين حاتم", ed:"مريم جبر", dates:"23/4 - 1/5", shot:true, idx:2, foley:false},
+ {id:9, t:"على معادنا", dir:"لينا أبو عبيد", snd:"يحيى الهرميل", ed:"فواز عثمان", dates:"1/5", shot:true, idx:2, foley:false},
+ {id:10,t:"هابيل", dir:"محمد احمد جابر", snd:"محمد محمود", ed:"عبد الرحمن", dates:"23/4", shot:true, idx:2, foley:false},
+ {id:11,t:"نور عين", dir:"نور الحجار", snd:"—", ed:"مريم باهر", dates:"28/4", shot:true, idx:2, foley:false},
+ {id:12,t:"نقطة تحول", dir:"—", snd:"عبد الرحمن احمد", ed:"دينا حسن", dates:"27/4", shot:true, idx:2, foley:false},
+ {id:13,t:"ظل وانعكاس (فيديو قصير)", dir:"—", snd:"—", ed:"—", dates:"21/4", shot:true, idx:2, foley:false},
+ {id:14,t:"نحت العمر (تسجيلي)", dir:"—", snd:"—", ed:"—", dates:"16/4 - 17/4", shot:true, idx:2, foley:false},
+ {id:15,t:"ألوان الدرب الأحمر (تسجيلي)", dir:"—", snd:"—", ed:"—", dates:"29/4", shot:true, idx:2, foley:false},
+ {id:16,t:"فيلم / ظرف ثانوي", dir:"—", snd:"عبد الرحمن احمد", ed:"عرفات مهدي", dates:"23/4", shot:true, idx:2, foley:false},
+ {id:17,t:"فيلم / اختيار", dir:"—", snd:"—", ed:"يوسف الشريف", dates:"4/5", shot:true, idx:2, foley:false},
+ {id:18,t:"فيلم / ليان", dir:"—", snd:"—", ed:"—", dates:"20/5 - 21/5", shot:false, idx:0, foley:false},
+ {id:19,t:"فيلم / محطة أخيرة", dir:"—", snd:"—", ed:"—", dates:"15/5", shot:false, idx:0, foley:false},
+ {id:20,t:"فيلم / رتوش", dir:"—", snd:"صمونيل إميل", ed:"—", dates:"14/5 - 15/5", shot:true, idx:2, foley:false},
+ {id:21,t:"فيلم المقبرة (تسجيلي)", dir:"—", snd:"—", ed:"—", dates:"9/5", shot:true, idx:2, foley:false},
+ {id:22,t:"شجر المشمش", dir:"يارا حجاج", snd:"—", ed:"—", dates:"—", shot:false, idx:0, foley:false}
+];
+
+const PROFESSORS = [
+  {name:"سلمى الباروني", phone:"+201277508992"},
+  {name:"إيهاب أمين",   phone:"+201226609798"},
+  {name:"دارين",        phone:"+201224851343"},
+  {name:"فيروز طارق",   phone:"+201146655510"}
+];
+
+let DATA = { projects: JSON.parse(JSON.stringify(SEED)), professors: PROFESSORS, bookings: [] };
+let LIVE = false;
+
+const $ = s => document.querySelector(s);
+const purposeNames = {foley:"تسجيل فولي", stereo:"مراجعة استيريو", mix:"المكساج النهائي (دولبي)"};
+
+function toast(msg, ok=true){
+  const t=$("#toast"); t.textContent=msg; t.style.borderColor= ok?"var(--ok)":"var(--bad)";
+  t.style.display="block"; setTimeout(()=>t.style.display="none",4000);
+}
+
+async function api(path, opts){
+  const r = await fetch(CONFIG.N8N_BASE+path, Object.assign({headers:{"Content-Type":"application/json"}}, opts));
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return r.json();
+}
+
+async function load(){
+  try{
+    const remote = await api("/data");
+    if(remote && remote.projects && remote.projects.length){ DATA = remote; LIVE = true; }
+  }catch(e){ LIVE = false; $("#liveBanner").style.display="block"; }
+  renderAll();
+}
+
+function renderAll(){ renderStats(); renderProjects(); fillSelects(); renderBookings(); renderClaims(); renderPipe(); }
+
+function renderStats(){
+  $("#stReady").textContent = DATA.projects.filter(p=>p.idx>=6).length;
+  $("#stActive").textContent = DATA.projects.filter(p=>p.shot && p.idx>0 && p.idx<6).length;
+  $("#stShoot").textContent = DATA.projects.filter(p=>!p.shot).length;
+  $("#days").textContent = Math.max(0, Math.ceil((new Date(CONFIG.JURY_DATE)-new Date())/864e5));
+}
+
+function stageChip(p){
+  if(!p.shot) return '<span class="chip c-bad">التصوير غير مكتمل</span>';
+  if(p.idx>=6) return '<span class="chip c-ok">جاهز للتحكيم ✔</span>';
+  const stage = STAGES[p.idx] || "—";
+  if(p.idx===MIX_IDX) return `<span class="chip c-mix">${stage}${p.mixStart?` (بدأ ${p.mixStart})`:""}</span>`;
+  if(p.idx===5) return `<span class="chip c-mix">${stage}</span>`;
+  if(p.idx>=FOLEY_IDX) return `<span class="chip c-warn">${stage}</span>`;
+  return `<span class="chip c-info">${stage}</span>`;
+}
+
+function renderProjects(){
+  const tb = $("#projTable tbody"); tb.innerHTML="";
+  DATA.projects.forEach(p=>{
+    const pct = Math.round(p.idx/6*100);
+    tb.insertAdjacentHTML("beforeend", `<tr>
+      <td>${p.id}</td><td><b>${p.t}</b></td><td>${p.dir}</td><td>${p.snd}</td><td>${p.ed}</td>
+      <td style="direction:ltr;text-align:left">${p.dates}</td>
+      <td>${p.shot?'<span class="chip c-ok">تم</span>':'<span class="chip c-bad">لم يتم</span>'}</td>
+      <td>${p.foley?'<span class="chip c-ok">✔</span>':'<span class="chip c-warn">—</span>'}</td>
+      <td>${stageChip(p)}</td>
+      <td><div class="bar"><i style="width:${pct}%"></i></div><span style="font-size:.7rem;color:var(--mut)">${pct}%</span></td>
+    </tr>`);
+  });
+}
+
+function fillSelects(){
+  ["#uProject","#bProject"].forEach(sel=>{
+    const el=$(sel); el.innerHTML="";
+    DATA.projects.forEach(p=> el.insertAdjacentHTML("beforeend",`<option value="${p.id}">${p.id} — ${p.t}</option>`));
+  });
+}
+
+function renderPipe(){
+  const p = DATA.projects.find(x=>x.id===+($("#uProject").value||1));
+  if(!p) return;
+  $("#uPipe").innerHTML = STAGES.map((s,i)=>{
+    const cls = i<p.idx?"done":(i===p.idx?"cur":"");
+    return `<span class="${cls}">${s}${i===FOLEY_IDX&&p.foley?" ✔":""}</span>`;
+  }).join("");
+}
+$("#uProject").addEventListener("change", renderPipe);
+
+$("#uSend").addEventListener("click", async ()=>{
+  const p = DATA.projects.find(x=>x.id===+$("#uProject").value);
+  const student = $("#uStudent").value.trim();
+  const action = $("#uAction").value;
+  const alertEl = $("#uAlert"); alertEl.style.display="none";
+  if(!student) return toast("اكتب اسمك أولًا", false);
+
+  if(action==="advance"){
+    if(p.idx+1===MIX_IDX && !p.foley){
+      alertEl.textContent="⛔ تنبيه المكساج: لا يمكن الانتقال إلى المكساج النهائي قبل تأكيد مراجعة الفولي.";
+      alertEl.style.display="block"; return;
+    }
+    if(p.idx>=6){ return toast("المشروع جاهز للتحكيم بالفعل ✔"); }
+  }
+  if(action==="foley_confirm" && p.idx<FOLEY_IDX){
+    alertEl.textContent="⛔ لا يمكن تأكيد مراجعة الفولي قبل الوصول لمرحلة الفولي.";
+    alertEl.style.display="block"; return;
+  }
+
+  const body = {projectId:p.id, project:p.t, student, action, note:$("#uNote").value.trim(),
+                fromStage:STAGES[p.idx], toStage: action==="advance"?STAGES[p.idx+1]:STAGES[p.idx]};
+  try{
+    if(LIVE) await api("/update",{method:"POST",body:JSON.stringify(body)});
+    if(action==="advance"){
+      p.idx++;
+      if(p.idx>0) p.shot=true;
+      if(p.idx===MIX_IDX && !p.mixStart){
+        const d=new Date(); p.mixStart=`${d.getDate()}/${d.getMonth()+1}`;
+      }
+    }
+    if(action==="foley_confirm") p.foley=true;
+    renderAll();
+    toast("✅ تم التحديث"+(LIVE?" وإخطار المشرف":" (محليًا)"));
+  }catch(e){ toast("تعذّر الإرسال — حاول مرة أخرى", false); }
+});
+
+function minDate(){ return new Date(Date.now()+CONFIG.MIN_HOURS*3600*1000).toISOString().slice(0,10); }
+document.addEventListener("DOMContentLoaded",()=> $("#bDate").setAttribute("min", minDate()));
+
+$("#bSend").addEventListener("click", async ()=>{
+  const p = DATA.projects.find(x=>x.id===+$("#bProject").value);
+  const dt = $("#bDate").value, slot = $("#bSlot").value, purpose = $("#bPurpose").value;
+  const alertEl = $("#bAlert"); alertEl.style.display="none";
+  if(!$("#bStudent").value.trim()) return toast("اكتب اسمك أولًا", false);
+  if(!dt) return toast("اختر التاريخ", false);
+  if(dt < minDate()){
+    alertEl.textContent="⛔ الحجز يجب أن يكون قبل الموعد بـ48 ساعة على الأقل.";
+    alertEl.style.display="block"; return;
+  }
+  const clash = DATA.bookings.find(b=>b.date===dt && b.slot===slot);
+  if(clash){
+    alertEl.textContent=`⛔ تنبيه تعارض: ${clash.date} (${clash.slot}) محجوز بالفعل لمشروع «${clash.project}».`;
+    alertEl.style.display="block"; return;
+  }
+  if(purpose==="mix" && !p.foley){
+    alertEl.textContent="⛔ لا يمكن حجز جلسة المكساج النهائي قبل تأكيد مراجعة الفولي لهذا المشروع.";
+    alertEl.style.display="block"; return;
+  }
+  const body = {projectId:p.id, project:p.t, student:$("#bStudent").value.trim(),
+                phone:$("#bPhone").value.trim(), date:dt, slot, purpose:purposeNames[purpose]};
+  try{
+    let id = "BK"+Math.floor(1000+Math.random()*9000);
+    if(LIVE){
+      const res = await api("/booking",{method:"POST",body:JSON.stringify(body)});
+      id = res.id||id;
+      if(res.clash){ alertEl.textContent="⛔ تعارض من الخادم: الموعد حُجز للتو لمشروع آخر."; alertEl.style.display="block"; return; }
+    }
+    DATA.bookings.push(Object.assign({id, supervisor:null}, body));
+    renderBookings(); renderClaims();
+    toast("✅ تم الحجز"+(LIVE?" وإبلاغ أساتذة اللجنة بالموعد":" (محليًا)"));
+  }catch(e){ toast("تعذّر الحجز — حاول مرة أخرى", false); }
+});
+
+function renderBookings(){
+  const el = $("#bookList"); el.innerHTML="";
+  const list = [...DATA.bookings].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!list.length){ el.innerHTML='<p class="note">لا توجد حجوزات بعد.</p>'; return; }
+  list.forEach(b=>{
+    el.insertAdjacentHTML("beforeend",`<div class="booking-item">
+      <div class="meta"><b>${b.project}</b> — ${b.student}<br>📅 ${b.date} | 🕐 ${b.slot}<br>🎯 ${b.purpose}</div>
+      ${b.supervisor?`<span class="tag-have">المشرف: ${b.supervisor}</span>`:`<span class="tag-need">بانتظار مشرف</span>`}
+    </div>`);
+  });
+}
+
+function renderClaims(){
+  const el = $("#claimList"); el.innerHTML="";
+  const open = DATA.bookings.filter(b=>!b.supervisor);
+  if(!open.length){ el.innerHTML='<p class="note">لا توجد حجوزات بانتظار مشرف حاليًا. ✅</p>'; return; }
+  open.forEach(b=>{
+    const opts = DATA.professors.map(p=>`<option value="${p.name}">${p.name}</option>`).join("");
+    el.insertAdjacentHTML("beforeend",`<div class="booking-item">
+      <div class="meta"><b>${b.project}</b> — ${b.student}<br>📅 ${b.date} | 🕐 ${b.slot} | 🎯 ${b.purpose}</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select data-id="${b.id}" style="min-width:170px">${opts}</select>
+        <button class="btn alt" style="margin:0" data-claim="${b.id}">أنزل إشراف</button>
+      </div>
+    </div>`);
+  });
+  el.querySelectorAll("[data-claim]").forEach(btn=>{
+    btn.addEventListener("click", ()=> claim(btn.dataset.claim, btn));
+  });
+}
+
+async function claim(id, btn){
+  const sel = document.querySelector(`select[data-id="${id}"]`);
+  const name = sel.value; btn.disabled = true;
+  try{
+    if(LIVE){
+      const res = await api("/claim",{method:"POST",body:JSON.stringify({bookingId:id, professor:name})});
+      if(res.taken){ toast("⚠️ سبقك أستاذ آخر بتسجيل الإشراف", false); await load(); return; }
+    }
+    const b = DATA.bookings.find(x=>x.id===id); if(b) b.supervisor = name;
+    renderBookings(); renderClaims();
+    toast("✅ تم تسجيل نزولك للإشراف وإبلاغ الطالب");
+  }catch(e){ toast("تعذّر التسجيل", false); btn.disabled=false; }
+}
+
+document.querySelectorAll("nav button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); $("#p-"+b.dataset.p).classList.add("active");
+  });
+});
+
+load();
+</script>
+</body>
+</html>

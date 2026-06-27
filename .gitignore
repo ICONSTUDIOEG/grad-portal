@@ -1,0 +1,15 @@
+# Hidden temp / MCP artifacts (root)
+.*
+!.gitignore
+
+# Generated compose blobs
+deploy-compose.yml
+deploy-compose-mini.yml
+docker-compose.deploy.*
+grad-compose-static*.zip
+
+# Duplicate / legacy (root only)
+/seed-data.json
+
+# OS
+.DS_Store

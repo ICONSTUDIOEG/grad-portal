@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تفاعلي — مشروعات التخرج 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0e1a2b;--navy2:#13233a;--card:#172a44;--line:#24405f;
+    --gold:#d4a843;--cyan:#3fc1c9;--txt:#eaf1f8;--mut:#9db3c8;
+    --ok:#3ec97e;--warn:#e8b339;--bad:#e35d5d;--purple:#9b6dd6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+  body{background:var(--navy);color:var(--txt);min-height:100vh}
+  header{background:linear-gradient(135deg,var(--navy2),var(--navy));border-bottom:2px solid var(--gold);padding:18px 24px}
+  header .top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start}
+  header h1{font-size:1.2rem;color:var(--gold)}
+  header h1 span{display:block;color:var(--cyan);font-size:.82rem;font-weight:400;margin-top:4px}
+  .links a{color:var(--cyan);font-size:.8rem;text-decoration:none;margin-left:14px}
+  .links a:hover{text-decoration:underline}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:16px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;cursor:pointer;transition:border-color .2s}
+  .stat:hover,.stat.active{border-color:var(--gold)}
+  .stat .n{font-size:1.6rem;font-weight:700}
+  .stat .l{font-size:.75rem;color:var(--mut);margin-top:2px}
+  .s-ready .n{color:var(--ok)}.s-finish .n{color:var(--warn)}
+  .s-mix .n{color:var(--purple)}.s-shoot .n{color:var(--bad)}.s-day .n{color:var(--cyan)}
+  main{max-width:1320px;margin:0 auto;padding:20px 24px 40px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:center}
+  .toolbar input,.toolbar select{background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:9px 12px;font-size:.88rem;min-width:160px}
+  .toolbar input{flex:1;min-width:200px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .card h2{color:var(--cyan);font-size:1rem;margin-bottom:12px}
+  .card h3{color:var(--gold);font-size:.9rem;margin:14px 0 8px}
+  table{width:100%;border-collapse:collapse;font-size:.8rem}
+  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--gold);position:sticky;top:0;background:var(--card);z-index:1}
+  tr:hover td{background:rgba(63,193,201,.05)}
+  tr.hidden{display:none}
+  .chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.68rem;white-space:nowrap}
+  .c-ready{background:rgba(62,201,126,.15);color:var(--ok);border:1px solid var(--ok)}
+  .c-finish{background:rgba(232,179,57,.15);color:var(--warn);border:1px solid var(--warn)}
+  .c-mix{background:rgba(155,109,214,.15);color:var(--purple);border:1px solid var(--purple)}
+  .c-shoot{background:rgba(227,93,93,.15);color:var(--bad);border:1px solid var(--bad)}
+  .c-ok{background:rgba(62,201,126,.12);color:var(--ok);border:1px solid rgba(62,201,126,.4)}
+  .c-no{background:rgba(227,93,93,.1);color:var(--bad);border:1px solid rgba(227,93,93,.4)}
+  .c-info{background:rgba(63,193,201,.1);color:var(--cyan);border:1px solid rgba(63,193,201,.4)}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.8rem}
+  .bar-row .lbl{min-width:120px;text-align:right;color:var(--mut)}
+  .bar-row .track{flex:1;background:var(--navy);border-radius:6px;height:10px;overflow:hidden}
+  .bar-row .track i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:6px}
+  .bar-row .cnt{min-width:28px;color:var(--gold);font-weight:600}
+  .fixes{list-style:none;font-size:.8rem;color:var(--mut);line-height:1.9}
+  .fixes li::before{content:"✓ ";color:var(--ok)}
+  .alert-list{display:flex;flex-direction:column;gap:8px}
+  .alert-item{border:1px dashed var(--bad);border-radius:8px;padding:8px 12px;font-size:.8rem;background:rgba(227,93,93,.08)}
+  .alert-item b{color:var(--bad)}
+  .meta-foot{font-size:.72rem;color:var(--mut);margin-top:12px;line-height:1.7}
+  .chart-wrap{position:relative;height:220px}
+  .table-wrap{overflow-x:auto;max-height:520px;overflow-y:auto}
+  .btn-dl{display:inline-block;background:linear-gradient(135deg,var(--gold),#b8902f);color:#1a1a1a;border:none;border-radius:8px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:none}
+  footer{text-align:center;color:var(--mut);font-size:.7rem;padding:20px;border-top:1px solid var(--line);line-height:1.8}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div>
+      <h1>📊 تقرير تفاعلي — مشروعات التخرج 2026
+        <span id="subtitle">جاري التحميل…</span>
+      </h1>
+      <div class="links">
+        <a href="index.html">← البوابة الرئيسية</a>
+        <a href="data/tracker-cleaned.xlsx" download>⬇ تحميل Excel المُحدَّث</a>
+      </div>
+    </div>
+    <div class="stat s-day" style="cursor:default;min-width:150px">
+      <div class="n" id="daysLeft">--</div>
+      <div class="l">يوم حتى التحكيم 30/6</div>
+    </div>
+  </div>
+  <div class="stats" id="statCards"></div>
+</header>
+
+<main>
+  <div class="grid2">
+    <div class="card">
+      <h2>توزيع الجاهزية للتحكيم</h2>
+      <div class="chart-wrap"><canvas id="chartReadiness"></canvas></div>
+    </div>
+    <div class="card">
+      <h2>حمل مهندسي الصوت</h2>
+      <div id="workloadBars"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>⚠ تنبيهات عاجلة</h2>
+    <div class="alert-list" id="alerts"></div>
+  </div>
+
+  <div class="card">
+    <h2>جدول المشاريع — فلترة تفاعلية</h2>
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="بحث بالاسم أو المخرج أو مهندس الصوت…">
+      <select id="filterStatus"><option value="">كل الحالات</option></select>
+      <select id="filterSound"><option value="">كل مهندسي الصوت</option></select>
+      <select id="filterShoot">
+        <option value="">التصوير: الكل</option>
+        <option value="done">التصوير مكتمل</option>
+        <option value="pending">التصوير غير مكتمل</option>
+      </select>
+      <select id="filterMix">
+        <option value="">المكساج: الكل</option>
+        <option value="done">مكساج تم</option>
+        <option value="pending">بانتظار المكساج</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table id="projTable">
+        <thead><tr>
+          <th>م</th><th>المشروع</th><th>إخراج</th><th>صوت</th><th>مونتاج</th>
+          <th>التصوير</th><th>المكساج</th><th>الفولي</th><th>الجاهزية</th><th>ملاحظات</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="meta-foot" id="filterCount"></p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>تقرير قسم الصوت</h2>
+      <div id="soundKpis"></div>
+      <h3>مشاريع بلا مهندس صوت</h3>
+      <div id="noEngineer"></div>
+      <h3>مكساج مكتمل</h3>
+      <div id="mixDone"></div>
+    </div>
+    <div class="card">
+      <h2>التصحيحات المُطبَّقة</h2>
+      <ul class="fixes" id="fixes"></ul>
+      <p class="meta-foot" id="metaInfo"></p>
+      <a class="btn-dl" href="data/tracker-cleaned.xlsx" download>تحميل النسخة المُنظَّفة (Excel)</a>
+    </div>
+  </div>
+</main>
+
+<footer>المعهد العالي للسينما — أكاديمية الفنون © 2026 · قسم هندسة الصوت · وحدة الذكاء الاصطناعي</footer>
+
+<script>
+let DATA = null;
+let chart = null;
+const $ = s => document.querySelector(s);
+
+const STATUS_CLASS = {
+  "جاهز للتحكيم ✔": "c-ready",
+  "قيد التشطيب": "c-finish",
+  "بانتظار المكساج": "c-mix",
+  "التصوير غير مكتمل": "c-shoot"
+};
+
+const STAT_CONFIG = [
+  {key:"all", label:"إجمالي المشاريع", cls:"", filter:()=>true},
+  {key:"ready", label:"جاهز للتحكيم", cls:"s-ready", filter:p=>p.readiness.includes("جاهز")},
+  {key:"finish", label:"قيد التشطيب", cls:"s-finish", filter:p=>p.readiness==="قيد التشطيب"},
+  {key:"mix", label:"بانتظار المكساج", cls:"s-mix", filter:p=>p.readiness==="بانتظار المكساج"},
+  {key:"shoot", label:"تصوير غير مكتمل", cls:"s-shoot", filter:p=>!p.shootingDone},
+  {key:"noeng", label:"بلا مهندس صوت", cls:"s-shoot", filter:p=>p.shootingDone && p.sound==="—"},
+];
+
+let activeStat = "all";
+
+function chip(text, cls){ return `<span class="chip ${cls}">${text}</span>`; }
+
+function readinessChip(r){
+  const cls = STATUS_CLASS[r] || "c-info";
+  return chip(r, cls);
+}
+
+async function load(){
+  const res = await fetch("data/projects.json");
+  DATA = await res.json();
+  render();
+}
+
+function render(){
+  const m = DATA.meta;
+  $("#subtitle").textContent = `محدَّث: ${new Date(m.cleanedAt).toLocaleString("ar-EG")} · المصدر: ${m.source}`;
+  $("#daysLeft").textContent = m.daysUntilJury;
+  $("#metaInfo").textContent = `تاريخ التحكيم: ${m.juryDate} · ${DATA.projects.length} مشروع`;
+
+  renderStatCards();
+  renderCharts();
+  renderAlerts();
+  renderTable();
+  renderSoundReport();
+  renderFixes();
+  populateFilters();
+}
+
+function renderStatCards(){
+  const el = $("#statCards");
+  el.innerHTML = STAT_CONFIG.map(s=>{
+    const n = s.key==="all" ? DATA.projects.length : DATA.projects.filter(s.filter).length;
+    return `<div class="stat ${s.cls}${activeStat===s.key?" active":""}" data-stat="${s.key}">
+      <div class="n">${n}</div><div class="l">${s.label}</div></div>`;
+  }).join("");
+  el.querySelectorAll(".stat[data-stat]").forEach(card=>{
+    card.addEventListener("click", ()=>{
+      activeStat = card.dataset.stat;
+      renderStatCards();
+      applyFilters();
+    });
+  });
+}
+
+function renderCharts(){
+  const labels = Object.keys(DATA.summary);
+  const values = Object.values(DATA.summary);
+  const colors = labels.map(l=>{
+    if(l.includes("جاهز")) return "#3ec97e";
+    if(l.includes("قيد")) return "#e8b339";
+    if(l.includes("بانتظار")) return "#9b6dd6";
+    return "#e35d5d";
+  });
+
+  if(chart) chart.destroy();
+  chart = new Chart($("#chartReadiness"), {
+    type:"doughnut",
+    data:{labels, datasets:[{data:values, backgroundColor:colors, borderWidth:0}]},
+    options:{
+      plugins:{legend:{position:"bottom", labels:{color:"#9db3c8", font:{size:11}}}},
+      maintainAspectRatio:false
+    }
+  });
+
+  const max = Math.max(...DATA.soundReport.workload.map(w=>w[1]), 1);
+  $("#workloadBars").innerHTML = DATA.soundReport.workload.map(([name,cnt])=>`
+    <div class="bar-row">
+      <span class="lbl">${name}</span>
+      <div class="track"><i style="width:${cnt/max*100}%"></i></div>
+      <span class="cnt">${cnt}</span>
+    </div>`).join("") || '<p class="meta-foot">لا يوجد مهندسو صوت مُسندون بعد.</p>';
+}
+
+function renderAlerts(){
+  const items = [];
+  const sr = DATA.soundReport;
+  if(sr.no_engineer) items.push(`<div class="alert-item"><b>${sr.no_engineer} مشروع</b> جاهز للمكساج بلا مهندس صوت مُسند — يجب الإسناد فورًا.</div>`);
+  if(sr.shooting_incomplete) items.push(`<div class="alert-item"><b>${sr.shooting_incomplete} مشروع</b> لم يكتمل تصويره — لا يمكن بدء المكساج.</div>`);
+  const mixPending = DATA.projects.filter(p=>p.shootingDone && !p.mixDone).length;
+  if(mixPending) items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> بانتظار المكساج والتحكيم بعد ${DATA.meta.daysUntilJury} يومًا فقط.</div>`);
+  const heavy = DATA.soundReport.workload.filter(w=>w[1]>=2);
+  heavy.forEach(([n,c])=> items.push(`<div class="alert-item">مهندس الصوت <b>${n}</b> محمّل بـ ${c} مشروعات — يُراعى عند الجدولة.</div>`));
+  $("#alerts").innerHTML = items.join("") || '<p class="meta-foot">لا توجد تنبيهات حرجة حاليًا ✅</p>';
+}
+
+function renderTable(){
+  const tb = $("#projTable tbody");
+  tb.innerHTML = DATA.projects.map(p=>`<tr data-id="${p.id}">
+    <td>${p.id}</td>
+    <td><b>${p.name}</b></td>
+    <td>${p.director}</td>
+    <td>${p.sound==="—"?chip("غير مُسند","c-no"):p.sound}</td>
+    <td>${p.editor}</td>
+    <td>${p.shootingDone?chip("تم","c-ok"):chip("لم يتم","c-no")}</td>
+    <td>${p.mixDone?chip("تم","c-ok"):chip("—","c-info")}</td>
+    <td>${p.foleyReview?chip("✔","c-ok"):p.foleyBooked?chip("محجوز","c-finish"):chip("—","c-info")}</td>
+    <td>${readinessChip(p.readiness)}</td>
+    <td style="font-size:.75rem;color:var(--mut)">${p.notes||p.foleyBooking||"—"}</td>
+  </tr>`).join("");
+  applyFilters();
+}
+
+function populateFilters(){
+  const statuses = [...new Set(DATA.projects.map(p=>p.readiness))];
+  $("#filterStatus").innerHTML = '<option value="">كل الحالات</option>' +
+    statuses.map(s=>`<option value="${s}">${s}</option>`).join("");
+
+  const engineers = [...new Set(DATA.projects.map(p=>p.sound).filter(s=>s!=="—"))].sort();
+  $("#filterSound").innerHTML = '<option value="">كل مهندسي الصوت</option>' +
+    engineers.map(s=>`<option value="${s}">${s}</option>`).join("") +
+    '<option value="__none__">غير مُسند</option>';
+}
+
+function applyFilters(){
+  const q = $("#search").value.trim().toLowerCase();
+  const st = $("#filterStatus").value;
+  const snd = $("#filterSound").value;
+  const shoot = $("#filterShoot").value;
+  const mix = $("#filterMix").value;
+  const statFn = (STAT_CONFIG.find(s=>s.key===activeStat)||STAT_CONFIG[0]).filter;
+
+  let visible = 0;
+  $("#projTable tbody tr").forEach(tr=>{
+    const p = DATA.projects.find(x=>x.id===+tr.dataset.id);
+    let show = statFn(p);
+    if(q && !`${p.name} ${p.director} ${p.sound}`.toLowerCase().includes(q)) show=false;
+    if(st && p.readiness!==st) show=false;
+    if(snd==="__none__" && p.sound!=="—") show=false;
+    else if(snd && snd!=="__none__" && p.sound!==snd) show=false;
+    if(shoot==="done" && !p.shootingDone) show=false;
+    if(shoot==="pending" && p.shootingDone) show=false;
+    if(mix==="done" && !p.mixDone) show=false;
+    if(mix==="pending" && p.mixDone) show=false;
+    tr.classList.toggle("hidden", !show);
+    if(show) visible++;
+  });
+  $("#filterCount").textContent = `عرض ${visible} من ${DATA.projects.length} مشروع`;
+}
+
+["search","filterStatus","filterSound","filterShoot","filterMix"].forEach(id=>{
+  $("#"+id).addEventListener("input", applyFilters);
+  $("#"+id).addEventListener("change", applyFilters);
+});
+
+function renderSoundReport(){
+  const sr = DATA.soundReport;
+  $("#soundKpis").innerHTML = `
+    <div class="stats" style="margin-top:0">
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--cyan)">${sr.total}</div><div class="l">إجمالي</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--ok)">${sr.mix_done}</div><div class="l">مكساج مكتمل</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--purple)">${sr.ready_for_mix}</div><div class="l">جاهز للمكساج</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--bad)">${sr.no_engineer}</div><div class="l">بلا مهندس</div></div>
+    </div>`;
+  $("#noEngineer").innerHTML = sr.no_engineer_projects.map(p=>chip(p.name,"c-no")).join(" ") || "—";
+  $("#mixDone").innerHTML = sr.mix_done_projects.map(n=>chip(n,"c-ok")).join(" ") || "—";
+}
+
+function renderFixes(){
+  $("#fixes").innerHTML = DATA.fixes.map(f=>`<li>${f}</li>`).join("");
+}
+
+load();
+</script>
+</body>
+</html>
