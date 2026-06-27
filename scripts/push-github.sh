@@ -20,6 +20,9 @@ fi
 
 gh auth status >/dev/null
 
+# Ensure git uses gh credentials in non-interactive shells
+gh auth setup-git 2>/dev/null || true
+
 if [[ ! -d .git ]]; then
   git init -b "${GITHUB_BRANCH}"
 fi
