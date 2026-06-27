@@ -1,0 +1,38 @@
+{
+  "title": "تواصل فريق اللجنة",
+  "subtitle": "للاستفسار والإشراف على مراحل ما بعد الإنتاج",
+  "staff": [
+    {
+      "name": "سلمى الباروني",
+      "nameSource": "سلمي الباروني",
+      "phone": "+201277508992",
+      "phoneDisplay": "+20 127 750 8992",
+      "email": "salmaelbaroni@gmail.com",
+      "role": "لجنة الإشراف على مشروعات التخرج"
+    },
+    {
+      "name": "إيهاب أمين",
+      "nameSource": "Ihab Amin",
+      "phone": "+201226609798",
+      "phoneDisplay": "+20 122 660 9798",
+      "email": "ihab.amin@aoa.edu.eg",
+      "role": "لجنة الإشراف على مشروعات التخرج"
+    },
+    {
+      "name": "دارين",
+      "nameSource": "Dareen",
+      "phone": "+201224851343",
+      "phoneDisplay": "+20 122 485 1343",
+      "email": "Dareenyunus@gmail.com",
+      "role": "لجنة الإشراف على مشروعات التخرج"
+    },
+    {
+      "name": "فيروز طارق",
+      "nameSource": "Fayrouz Tarek",
+      "phone": "+201146655510",
+      "phoneDisplay": "+20 114 665 5510",
+      "email": "fayrouz8889@gmail.com",
+      "role": "لجنة الإشراف على مشروعات التخرج"
+    }
+  ]
+}

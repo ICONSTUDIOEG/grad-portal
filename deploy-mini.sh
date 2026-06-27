@@ -31,6 +31,7 @@ services:
         wget -qO /usr/share/nginx/html/index.html "${GITHUB_RAW_BASE}/index.html"
         wget -qO /usr/share/nginx/html/dashboard.html "${GITHUB_RAW_BASE}/dashboard.html"
         wget -qO /usr/share/nginx/html/data/projects.json "${GITHUB_RAW_BASE}/data/projects.json"
+        wget -qO /usr/share/nginx/html/data/contacts.json "${GITHUB_RAW_BASE}/data/contacts.json"
         wget -qO /usr/share/nginx/html/data/tracker-cleaned.xlsx "${GITHUB_RAW_BASE}/data/tracker-cleaned.xlsx"
         exec nginx -g 'daemon off;'
 
@@ -74,7 +75,7 @@ EOF
 
 if [[ "$MODE" == "github" ]]; then
   echo "Using GitHub raw: ${GITHUB_RAW_BASE}"
-  for path in index.html dashboard.html data/projects.json data/tracker-cleaned.xlsx; do
+  for path in index.html dashboard.html data/projects.json data/contacts.json data/tracker-cleaned.xlsx; do
   code=$(curl -sS -o /dev/null -w "%{http_code}" "${GITHUB_RAW_BASE}/${path}")
   if [[ "$code" != "200" ]]; then
     echo "ERROR: GitHub file not found (${code}): ${GITHUB_RAW_BASE}/${path}" >&2

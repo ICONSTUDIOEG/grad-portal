@@ -62,6 +62,12 @@
   .chart-wrap{position:relative;height:220px}
   .table-wrap{overflow-x:auto;max-height:520px;overflow-y:auto}
   .btn-dl{display:inline-block;background:linear-gradient(135deg,var(--gold),#b8902f);color:#1a1a1a;border:none;border-radius:8px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;text-decoration:none}
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .contact-card{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .contact-card h4{color:var(--gold);font-size:.95rem;margin-bottom:4px}
+  .contact-card .role{font-size:.72rem;color:var(--mut);margin-bottom:10px;line-height:1.5}
+  .contact-card a{display:block;font-size:.82rem;color:var(--cyan);text-decoration:none;margin-top:6px;direction:ltr;text-align:right}
+  .contact-card a:hover{text-decoration:underline;color:var(--gold)}
   footer{text-align:center;color:var(--mut);font-size:.7rem;padding:20px;border-top:1px solid var(--line);line-height:1.8}
 </style>
 </head>
@@ -101,6 +107,12 @@
   <div class="card">
     <h2>⚠ تنبيهات عاجلة</h2>
     <div class="alert-list" id="alerts"></div>
+  </div>
+
+  <div class="card" id="staffContacts">
+    <h2>📞 تواصل فريق اللجنة</h2>
+    <p class="meta-foot" id="contactsSubtitle" style="margin-top:0;margin-bottom:12px"></p>
+    <div class="contact-grid" id="contactGrid"></div>
   </div>
 
   <div class="card">
@@ -154,6 +166,7 @@
 
 <script>
 let DATA = null;
+let CONTACTS = null;
 let chart = null;
 const $ = s => document.querySelector(s);
 
@@ -183,8 +196,12 @@ function readinessChip(r){
 }
 
 async function load(){
-  const res = await fetch("data/projects.json");
-  DATA = await res.json();
+  const [projectsRes, contactsRes] = await Promise.all([
+    fetch("data/projects.json"),
+    fetch("data/contacts.json"),
+  ]);
+  DATA = await projectsRes.json();
+  CONTACTS = await contactsRes.json();
   render();
 }
 
@@ -200,6 +217,7 @@ function render(){
   renderTable();
   renderSoundReport();
   renderFixes();
+  renderContacts();
   populateFilters();
 }
 
@@ -334,6 +352,18 @@ function renderSoundReport(){
 
 function renderFixes(){
   $("#fixes").innerHTML = DATA.fixes.map(f=>`<li>${f}</li>`).join("");
+}
+
+function renderContacts(){
+  if(!CONTACTS?.staff?.length) return;
+  $("#contactsSubtitle").textContent = CONTACTS.subtitle || "";
+  $("#contactGrid").innerHTML = CONTACTS.staff.map(s=>`
+    <div class="contact-card">
+      <h4>${s.name}</h4>
+      <div class="role">${s.role || ""}</div>
+      <a href="tel:${s.phone}">📱 ${s.phoneDisplay || s.phone}</a>
+      ${s.email ? `<a href="mailto:${s.email}">✉️ ${s.email}</a>` : ""}
+    </div>`).join("");
 }
 
 load();
