@@ -7,6 +7,8 @@ source ./deploy.config.sh
 MODE="${1:-github}"  # github | zip-url
 
 write_compose_from_github() {
+  local rev
+  rev="$(git rev-parse --short HEAD 2>/dev/null || date +%s)"
   cat > deploy-compose-mini.yml <<EOF
 services:
   web:
@@ -27,12 +29,13 @@ services:
       - -c
       - |
         set -e
+        echo "grad-portal deploy ${rev}"
         mkdir -p /usr/share/nginx/html/data
-        wget -qO /usr/share/nginx/html/index.html "${GITHUB_RAW_BASE}/index.html"
-        wget -qO /usr/share/nginx/html/dashboard.html "${GITHUB_RAW_BASE}/dashboard.html"
-        wget -qO /usr/share/nginx/html/data/projects.json "${GITHUB_RAW_BASE}/data/projects.json"
-        wget -qO /usr/share/nginx/html/data/contacts.json "${GITHUB_RAW_BASE}/data/contacts.json"
-        wget -qO /usr/share/nginx/html/data/tracker-cleaned.xlsx "${GITHUB_RAW_BASE}/data/tracker-cleaned.xlsx"
+        wget -qO /usr/share/nginx/html/index.html "${GITHUB_RAW_BASE}/index.html?${rev}"
+        wget -qO /usr/share/nginx/html/dashboard.html "${GITHUB_RAW_BASE}/dashboard.html?${rev}"
+        wget -qO /usr/share/nginx/html/data/projects.json "${GITHUB_RAW_BASE}/data/projects.json?${rev}"
+        wget -qO /usr/share/nginx/html/data/contacts.json "${GITHUB_RAW_BASE}/data/contacts.json?${rev}"
+        wget -qO /usr/share/nginx/html/data/tracker-cleaned.xlsx "${GITHUB_RAW_BASE}/data/tracker-cleaned.xlsx?${rev}"
         exec nginx -g 'daemon off;'
 
 networks:
