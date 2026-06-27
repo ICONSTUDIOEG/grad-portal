@@ -60,6 +60,12 @@
   .pipeline span.done{border-color:var(--ok);color:var(--ok)}
   .pipeline span.cur{border-color:var(--gold);color:var(--gold);font-weight:700}
   footer{text-align:center;color:var(--mut);font-size:.7rem;padding:18px;border-top:1px solid var(--line);margin-top:30px;line-height:1.8}
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .contact-card{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .contact-card h4{color:var(--gold);font-size:.95rem;margin-bottom:4px}
+  .contact-card .role{font-size:.72rem;color:var(--mut);margin-bottom:10px;line-height:1.5}
+  .contact-card a{display:block;font-size:.82rem;color:var(--cyan);text-decoration:none;margin-top:6px;direction:ltr;text-align:right}
+  .contact-card a:hover{text-decoration:underline;color:var(--gold)}
 </style>
 </head>
 <body>
@@ -98,6 +104,11 @@
         </table>
       </div>
       <p class="note">مسار الاعتماد الإجباري: تصوير ← مونتاج ← الفولي ← مراجعة استيريو ← المكساج النهائي (دولبي) ← DCP ← جاهز للتحكيم. لا يُسمح بتخطي مرحلة.</p>
+    </div>
+    <div class="card" id="staffContacts">
+      <h3>📞 تواصل فريق اللجنة</h3>
+      <p class="note" id="contactsSubtitle" style="margin-top:0;margin-bottom:12px"></p>
+      <div class="contact-grid" id="contactGrid"></div>
     </div>
   </section>
 
@@ -206,6 +217,7 @@ const PROFESSORS = [
 ];
 
 let DATA = { projects: JSON.parse(JSON.stringify(SEED)), professors: PROFESSORS, bookings: [] };
+let CONTACTS = null;
 let LIVE = false;
 
 const $ = s => document.querySelector(s);
@@ -224,13 +236,34 @@ async function api(path, opts){
 
 async function load(){
   try{
-    const remote = await api("/data");
+    const [remote, contactsRes] = await Promise.all([
+      api("/data").catch(()=>null),
+      fetch("data/contacts.json").then(r=>r.ok?r.json():null).catch(()=>null)
+    ]);
     if(remote && remote.projects && remote.projects.length){ DATA = remote; LIVE = true; }
+    else { LIVE = false; $("#liveBanner").style.display="block"; }
+    CONTACTS = contactsRes;
   }catch(e){ LIVE = false; $("#liveBanner").style.display="block"; }
   renderAll();
 }
 
-function renderAll(){ renderStats(); renderProjects(); fillSelects(); renderBookings(); renderClaims(); renderPipe(); }
+function renderAll(){ renderStats(); renderProjects(); fillSelects(); renderBookings(); renderClaims(); renderPipe(); renderContacts(); }
+
+function renderContacts(){
+  const grid = $("#contactGrid");
+  const staff = CONTACTS?.staff?.length ? CONTACTS.staff : PROFESSORS.map(p=>({
+    name: p.name, phone: p.phone, phoneDisplay: p.phone, email: p.email, role: "لجنة الإشراف على مشروعات التخرج"
+  }));
+  if(!staff.length){ $("#staffContacts").style.display="none"; return; }
+  $("#contactsSubtitle").textContent = CONTACTS?.subtitle || "للاستفسار والإشراف على مراحل ما بعد الإنتاج";
+  grid.innerHTML = staff.map(s=>`
+    <div class="contact-card">
+      <h4>${s.name}</h4>
+      <div class="role">${s.role || ""}</div>
+      <a href="tel:${s.phone}">📱 ${s.phoneDisplay || s.phone}</a>
+      ${s.email ? `<a href="mailto:${s.email}">✉️ ${s.email}</a>` : ""}
+    </div>`).join("");
+}
 
 function renderStats(){
   $("#stReady").textContent = DATA.projects.filter(p=>p.idx>=6).length;
