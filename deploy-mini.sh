@@ -14,6 +14,8 @@ services:
   web:
     image: nginx:alpine
     restart: always
+    volumes:
+      - grad_data:/usr/share/nginx/html/data
     networks:
       - n8n_default
     labels:
@@ -23,6 +25,7 @@ services:
       - traefik.http.routers.grad.entrypoints=web,websecure
       - traefik.http.routers.grad.tls=true
       - traefik.http.routers.grad.tls.certresolver=mytlschallenge
+      - traefik.http.routers.grad.priority=1
       - traefik.http.services.grad.loadbalancer.server.port=80
     command:
       - sh
@@ -36,7 +39,40 @@ services:
         wget -qO /usr/share/nginx/html/data/projects.json "${GITHUB_RAW_BASE}/data/projects.json?${rev}"
         wget -qO /usr/share/nginx/html/data/contacts.json "${GITHUB_RAW_BASE}/data/contacts.json?${rev}"
         wget -qO /usr/share/nginx/html/data/tracker-cleaned.xlsx "${GITHUB_RAW_BASE}/data/tracker-cleaned.xlsx?${rev}"
+        if [ ! -f /usr/share/nginx/html/data/portal-state.json ]; then
+          wget -qO /usr/share/nginx/html/data/portal-state.json "${GITHUB_RAW_BASE}/data/portal-state.json?${rev}"
+        fi
         exec nginx -g 'daemon off;'
+
+  api:
+    image: python:3-alpine
+    restart: always
+    volumes:
+      - grad_data:/data
+    environment:
+      STATE_PATH: /data/portal-state.json
+      PORT: "8080"
+    networks:
+      - n8n_default
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_default
+      - "traefik.http.routers.grad-api.rule=Host(\`grad.iconstudio.tech\`) && PathPrefix(\`/api\`)"
+      - traefik.http.routers.grad-api.entrypoints=web,websecure
+      - traefik.http.routers.grad-api.tls=true
+      - traefik.http.routers.grad-api.tls.certresolver=mytlschallenge
+      - traefik.http.routers.grad-api.priority=200
+      - traefik.http.services.grad-api.loadbalancer.server.port=8080
+    command:
+      - sh
+      - -c
+      - |
+        set -e
+        wget -qO /tmp/state-server.py "${GITHUB_RAW_BASE}/api/state-server.py?${rev}"
+        python3 /tmp/state-server.py
+
+volumes:
+  grad_data:
 
 networks:
   n8n_default:
@@ -78,7 +114,7 @@ EOF
 
 if [[ "$MODE" == "github" ]]; then
   echo "Using GitHub raw: ${GITHUB_RAW_BASE}"
-  for path in index.html dashboard.html data/projects.json data/contacts.json data/tracker-cleaned.xlsx; do
+  for path in index.html dashboard.html api/state-server.py data/projects.json data/contacts.json data/portal-state.json data/tracker-cleaned.xlsx; do
   code=$(curl -sS -o /dev/null -w "%{http_code}" "${GITHUB_RAW_BASE}/${path}")
   if [[ "$code" != "200" ]]; then
     echo "ERROR: GitHub file not found (${code}): ${GITHUB_RAW_BASE}/${path}" >&2

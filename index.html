@@ -66,6 +66,13 @@
   .contact-card .role{font-size:.72rem;color:var(--mut);margin-bottom:10px;line-height:1.5}
   .contact-card a{display:block;font-size:.82rem;color:var(--cyan);text-decoration:none;margin-top:6px;direction:ltr;text-align:right}
   .contact-card a:hover{text-decoration:underline;color:var(--gold)}
+  .slot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:10px 0 14px}
+  .slot-box{border:1px solid var(--line);border-radius:8px;padding:10px;font-size:.76rem;line-height:1.6;text-align:center}
+  .slot-free{border-color:var(--ok);background:rgba(62,201,126,.08);color:var(--ok)}
+  .slot-busy{border-color:var(--bad);background:rgba(227,93,93,.1);color:var(--bad)}
+  .slot-busy b{color:var(--gold);display:block;margin-top:4px;font-size:.72rem}
+  .sync-note{font-size:.72rem;color:var(--mut);margin-top:8px}
+  .sync-note.live{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -89,7 +96,7 @@
 </nav>
 
 <main>
-  <div id="liveBanner">⚠️ وضع غير متصل — التعديلات محلية فقط ولن تُرسل إشعارات حتى الاتصال بالخادم</div>
+  <div id="liveBanner">⚠️ تعذّر الاتصال بخادم الحفظ — تأكد من الاتصال ثم أعد تحميل الصفحة قبل الحجز</div>
 
   <section class="panel active" id="p-projects">
     <div class="card">
@@ -145,6 +152,10 @@
           <option value="mix">المكساج النهائي (دولبي)</option>
         </select>
         <label>التاريخ</label><input type="date" id="bDate">
+        <div id="slotAvailability" style="display:none">
+          <label style="margin-top:4px">حالة المواعيد في هذا اليوم</label>
+          <div class="slot-grid" id="slotGrid"></div>
+        </div>
         <label>الفترة</label>
         <select id="bSlot">
           <option>9:00 – 12:00 صباحًا</option>
@@ -157,6 +168,7 @@
       </div>
       <div class="card">
         <h3>الحجوزات القادمة</h3>
+        <p class="sync-note" id="syncNote"></p>
         <div id="bookList"></div>
       </div>
     </div>
@@ -167,6 +179,17 @@
       <h3>حجوزات تحتاج مشرفًا — أول من يسجّل يثبت الإشراف باسمه</h3>
       <div id="claimList"></div>
     </div>
+    <div class="card">
+      <h3>📅 جدول حجوزات الاستوديو (كل المواعيد)</h3>
+      <div style="overflow-x:auto">
+        <table id="boardTable">
+          <thead><tr>
+            <th>التاريخ</th><th>الفترة</th><th>المشروع</th><th>الطالب</th><th>الغرض</th><th>المشرف</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </main>
 
@@ -176,9 +199,17 @@
 <script>
 const CONFIG = {
   N8N_BASE: "https://icon98.app.n8n.cloud/webhook/grad",
+  STATE_API: "/api/state",
   MIN_HOURS: 48,
-  JURY_DATE: "2026-06-30"
+  JURY_DATE: "2026-06-30",
+  POLL_MS: 20000
 };
+
+const SLOTS = [
+  "9:00 – 12:00 صباحًا",
+  "12:00 – 3:00 ظهرًا",
+  "3:00 – 6:00 مساءً"
+];
 
 const STAGES = ["تصوير","مونتاج","الفولي","مراجعة استيريو","المكساج النهائي","DCP","جاهز للتحكيم"];
 const MIX_IDX = 4;
@@ -219,9 +250,58 @@ const PROFESSORS = [
 let DATA = { projects: JSON.parse(JSON.stringify(SEED)), professors: PROFESSORS, bookings: [] };
 let CONTACTS = null;
 let LIVE = false;
+let saving = false;
 
 const $ = s => document.querySelector(s);
 const purposeNames = {foley:"تسجيل فولي", stereo:"مراجعة استيريو", mix:"المكساج النهائي (دولبي)"};
+
+function applyRemoteState(remote){
+  if(remote?.projects?.length) DATA.projects = remote.projects;
+  DATA.bookings = Array.isArray(remote?.bookings) ? remote.bookings : [];
+  DATA.professors = remote?.professors?.length ? remote.professors : PROFESSORS;
+}
+
+async function loadState(){
+  const r = await fetch(CONFIG.STATE_API, {cache:"no-store"});
+  if(!r.ok) throw new Error("state HTTP "+r.status);
+  return r.json();
+}
+
+async function saveState(){
+  if(saving) return;
+  saving = true;
+  try{
+    const r = await fetch(CONFIG.STATE_API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        projects: DATA.projects,
+        bookings: DATA.bookings,
+        professors: DATA.professors
+      })
+    });
+    if(!r.ok) throw new Error("save HTTP "+r.status);
+    LIVE = true;
+    $("#liveBanner").style.display="none";
+    const note = $("#syncNote");
+    if(note){
+      note.textContent = "✅ البيانات محفوظة على الخادم — تظهر لجميع المستخدمين بعد التحديث";
+      note.classList.add("live");
+    }
+  }catch(e){
+    LIVE = false;
+    $("#liveBanner").style.display="block";
+    throw e;
+  }finally{
+    saving = false;
+  }
+}
+
+async function notifyN8n(path, body){
+  try{
+    await api(path, {method:"POST", body: JSON.stringify(body)});
+  }catch(e){ /* optional notifications */ }
+}
 
 function toast(msg, ok=true){
   const t=$("#toast"); t.textContent=msg; t.style.borderColor= ok?"var(--ok)":"var(--bad)";
@@ -236,18 +316,77 @@ async function api(path, opts){
 
 async function load(){
   try{
-    const [remote, contactsRes] = await Promise.all([
-      api("/data").catch(()=>null),
+    const [state, contactsRes] = await Promise.all([
+      loadState(),
       fetch("data/contacts.json").then(r=>r.ok?r.json():null).catch(()=>null)
     ]);
-    if(remote && remote.projects && remote.projects.length){ DATA = remote; LIVE = true; }
-    else { LIVE = false; $("#liveBanner").style.display="block"; }
+    applyRemoteState(state);
+    LIVE = true;
+    $("#liveBanner").style.display="none";
     CONTACTS = contactsRes;
-  }catch(e){ LIVE = false; $("#liveBanner").style.display="block"; }
+  }catch(e){
+    LIVE = false;
+    $("#liveBanner").style.display="block";
+    try{
+      CONTACTS = await fetch("data/contacts.json").then(r=>r.ok?r.json():null);
+    }catch(_){}
+  }
   renderAll();
 }
 
-function renderAll(){ renderStats(); renderProjects(); fillSelects(); renderBookings(); renderClaims(); renderPipe(); renderContacts(); }
+function renderAll(){
+  renderStats(); renderProjects(); fillSelects(); renderBookings(); renderClaims();
+  renderBoardTable(); renderPipe(); renderContacts(); renderSlotAvailability(); updateSyncNote();
+}
+
+function updateSyncNote(){
+  const note = $("#syncNote");
+  if(!note) return;
+  if(LIVE){
+    note.textContent = "✅ البيانات محفوظة على الخادم — آخر تحديث يظهر تلقائيًا كل "+Math.round(CONFIG.POLL_MS/1000)+" ثانية";
+    note.classList.add("live");
+  }else{
+    note.textContent = "⚠️ تعذّر الاتصال بالخادم — الحجوزات لن تُحفظ حتى يعود الاتصال";
+    note.classList.remove("live");
+  }
+}
+
+function bookingsForDate(date){
+  return DATA.bookings.filter(b=>b.date===date);
+}
+
+function isSlotBooked(date, slot){
+  return DATA.bookings.find(b=>b.date===date && b.slot===slot);
+}
+
+function renderSlotAvailability(){
+  const dt = $("#bDate").value;
+  const wrap = $("#slotAvailability");
+  const grid = $("#slotGrid");
+  const slotSel = $("#bSlot");
+  if(!dt){
+    wrap.style.display="none";
+    return;
+  }
+  wrap.style.display="block";
+  grid.innerHTML = SLOTS.map(slot=>{
+    const hit = isSlotBooked(dt, slot);
+    if(hit){
+      return `<div class="slot-box slot-busy"><div>${slot}</div>🚫 محجوز<br><b>${hit.project}</b><br>${hit.student}</div>`;
+    }
+    return `<div class="slot-box slot-free"><div>${slot}</div>✅ متاح</div>`;
+  }).join("");
+
+  Array.from(slotSel.options).forEach(opt=>{
+    const hit = isSlotBooked(dt, opt.value);
+    opt.disabled = !!hit;
+    opt.textContent = hit ? `${opt.value} — محجوز (${hit.project})` : opt.value;
+  });
+  if(isSlotBooked(dt, slotSel.value)){
+    const free = SLOTS.find(s=>!isSlotBooked(dt, s));
+    if(free) slotSel.value = free;
+  }
+}
 
 function renderContacts(){
   const grid = $("#contactGrid");
@@ -336,7 +475,6 @@ $("#uSend").addEventListener("click", async ()=>{
   const body = {projectId:p.id, project:p.t, student, action, note:$("#uNote").value.trim(),
                 fromStage:STAGES[p.idx], toStage: action==="advance"?STAGES[p.idx+1]:STAGES[p.idx]};
   try{
-    if(LIVE) await api("/update",{method:"POST",body:JSON.stringify(body)});
     if(action==="advance"){
       p.idx++;
       if(p.idx>0) p.shot=true;
@@ -345,13 +483,19 @@ $("#uSend").addEventListener("click", async ()=>{
       }
     }
     if(action==="foley_confirm") p.foley=true;
+    await saveState();
+    await notifyN8n("/update", body);
     renderAll();
-    toast("✅ تم التحديث"+(LIVE?" وإخطار المشرف":" (محليًا)"));
+    toast("✅ تم التحديث"+(LIVE?" وحُفظ على الخادم":" (محليًا)"));
   }catch(e){ toast("تعذّر الإرسال — حاول مرة أخرى", false); }
 });
 
 function minDate(){ return new Date(Date.now()+CONFIG.MIN_HOURS*3600*1000).toISOString().slice(0,10); }
-document.addEventListener("DOMContentLoaded",()=> $("#bDate").setAttribute("min", minDate()));
+document.addEventListener("DOMContentLoaded",()=>{
+  $("#bDate").setAttribute("min", minDate());
+  $("#bDate").addEventListener("change", renderSlotAvailability);
+  $("#bSlot").addEventListener("change", renderSlotAvailability);
+});
 
 $("#bSend").addEventListener("click", async ()=>{
   const p = DATA.projects.find(x=>x.id===+$("#bProject").value);
@@ -376,26 +520,46 @@ $("#bSend").addEventListener("click", async ()=>{
                 phone:$("#bPhone").value.trim(), date:dt, slot, purpose:purposeNames[purpose]};
   try{
     let id = "BK"+Math.floor(1000+Math.random()*9000);
-    if(LIVE){
-      const res = await api("/booking",{method:"POST",body:JSON.stringify(body)});
-      id = res.id||id;
-      if(res.clash){ alertEl.textContent="⛔ تعارض من الخادم: الموعد حُجز للتو لمشروع آخر."; alertEl.style.display="block"; return; }
-    }
-    DATA.bookings.push(Object.assign({id, supervisor:null}, body));
-    renderBookings(); renderClaims();
-    toast("✅ تم الحجز"+(LIVE?" وإبلاغ أساتذة اللجنة بالموعد":" (محليًا)"));
+    DATA.bookings.push(Object.assign({id, supervisor:null, createdAt:new Date().toISOString()}, body));
+    await saveState();
+    await notifyN8n("/booking", body);
+    renderAll();
+    toast("✅ تم الحجز وحُفظ على الخادم — يظهر في لوحة الإشراف");
   }catch(e){ toast("تعذّر الحجز — حاول مرة أخرى", false); }
 });
 
 function renderBookings(){
   const el = $("#bookList"); el.innerHTML="";
-  const list = [...DATA.bookings].sort((a,b)=>a.date.localeCompare(b.date));
-  if(!list.length){ el.innerHTML='<p class="note">لا توجد حجوزات بعد.</p>'; return; }
+  const today = new Date().toISOString().slice(0,10);
+  const list = [...DATA.bookings].filter(b=>b.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+  if(!list.length){ el.innerHTML='<p class="note">لا توجد حجوزات قادمة بعد.</p>'; return; }
   list.forEach(b=>{
     el.insertAdjacentHTML("beforeend",`<div class="booking-item">
       <div class="meta"><b>${b.project}</b> — ${b.student}<br>📅 ${b.date} | 🕐 ${b.slot}<br>🎯 ${b.purpose}</div>
       ${b.supervisor?`<span class="tag-have">المشرف: ${b.supervisor}</span>`:`<span class="tag-need">بانتظار مشرف</span>`}
     </div>`);
+  });
+}
+
+function renderBoardTable(){
+  const tb = $("#boardTable tbody");
+  if(!tb) return;
+  tb.innerHTML="";
+  const today = new Date().toISOString().slice(0,10);
+  const list = [...DATA.bookings].filter(b=>b.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||a.slot.localeCompare(b.slot));
+  if(!list.length){
+    tb.innerHTML='<tr><td colspan="6" class="note" style="text-align:center;padding:16px">لا توجد حجوزات قادمة في الجدول.</td></tr>';
+    return;
+  }
+  list.forEach(b=>{
+    tb.insertAdjacentHTML("beforeend", `<tr>
+      <td style="direction:ltr">${b.date}</td>
+      <td>${b.slot}</td>
+      <td><b>${b.project}</b></td>
+      <td>${b.student}</td>
+      <td>${b.purpose}</td>
+      <td>${b.supervisor?`<span class="chip c-ok">${b.supervisor}</span>`:`<span class="chip c-warn">بانتظار مشرف</span>`}</td>
+    </tr>`);
   });
 }
 
@@ -422,13 +586,14 @@ async function claim(id, btn){
   const sel = document.querySelector(`select[data-id="${id}"]`);
   const name = sel.value; btn.disabled = true;
   try{
-    if(LIVE){
-      const res = await api("/claim",{method:"POST",body:JSON.stringify({bookingId:id, professor:name})});
-      if(res.taken){ toast("⚠️ سبقك أستاذ آخر بتسجيل الإشراف", false); await load(); return; }
-    }
-    const b = DATA.bookings.find(x=>x.id===id); if(b) b.supervisor = name;
-    renderBookings(); renderClaims();
-    toast("✅ تم تسجيل نزولك للإشراف وإبلاغ الطالب");
+    const b = DATA.bookings.find(x=>x.id===id);
+    if(!b) return toast("الحجز غير موجود", false);
+    if(b.supervisor){ toast("⚠️ سبق تسجيل مشرف لهذا الحجز", false); await load(); return; }
+    b.supervisor = name;
+    await saveState();
+    await notifyN8n("/claim", {bookingId:id, professor:name});
+    renderAll();
+    toast("✅ تم تسجيل نزولك للإشراف وحُفظ على الخادم");
   }catch(e){ toast("تعذّر التسجيل", false); btn.disabled=false; }
 }
 
@@ -441,6 +606,15 @@ document.querySelectorAll("nav button").forEach(b=>{
 });
 
 load();
+setInterval(async ()=>{
+  try{
+    const state = await loadState();
+    const prev = JSON.stringify(DATA.bookings);
+    applyRemoteState(state);
+    if(JSON.stringify(DATA.bookings)!==prev) renderAll();
+    else if(!LIVE){ LIVE = true; $("#liveBanner").style.display="none"; updateSyncNote(); }
+  }catch(_){}
+}, CONFIG.POLL_MS);
 </script>
 </body>
 </html>
