@@ -8,9 +8,14 @@ REPO_SLUG="${GITHUB_OWNER}/${GITHUB_REPO}"
 REMOTE="https://github.com/${REPO_SLUG}.git"
 
 if ! command -v gh >/dev/null 2>&1; then
-  echo "GitHub CLI (gh) is required. Install: https://cli.github.com/" >&2
-  echo "Then run: gh auth login" >&2
-  exit 1
+  GH_BIN="${GH_BIN:-/tmp/gh-cli/gh_2.95.0_macOS_arm64/bin/gh}"
+  if [[ -x "$GH_BIN" ]]; then
+    gh() { "$GH_BIN" "$@"; }
+  else
+    echo "GitHub CLI (gh) is required. Install: https://cli.github.com/" >&2
+    echo "Then run: gh auth login" >&2
+    exit 1
+  fi
 fi
 
 gh auth status >/dev/null
