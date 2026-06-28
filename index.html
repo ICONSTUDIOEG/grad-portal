@@ -141,7 +141,7 @@
   <section class="panel" id="p-booking">
     <div class="two">
       <div class="card">
-        <h3>حجز جديد — قبل الموعد بـ48 ساعة على الأقل</h3>
+        <h3>حجز جديد — قبل الموعد بـ24 ساعة على الأقل</h3>
         <label>المشروع</label><select id="bProject"></select>
         <label>اسم الطالب</label><input id="bStudent" placeholder="اكتب اسمك">
         <label>رقم هاتف الطالب</label><input id="bPhone" placeholder="01xxxxxxxxx" inputmode="tel">
@@ -200,7 +200,7 @@
 const CONFIG = {
   N8N_BASE: "https://icon98.app.n8n.cloud/webhook/grad",
   STATE_API: "/api/state",
-  MIN_HOURS: 48,
+  MIN_HOURS: 24,
   JURY_DATE: "2026-06-30",
   POLL_MS: 20000
 };
@@ -504,7 +504,7 @@ $("#bSend").addEventListener("click", async ()=>{
   if(!$("#bStudent").value.trim()) return toast("اكتب اسمك أولًا", false);
   if(!dt) return toast("اختر التاريخ", false);
   if(dt < minDate()){
-    alertEl.textContent="⛔ الحجز يجب أن يكون قبل الموعد بـ48 ساعة على الأقل.";
+    alertEl.textContent="⛔ الحجز يجب أن يكون قبل الموعد بـ24 ساعة على الأقل.";
     alertEl.style.display="block"; return;
   }
   const clash = DATA.bookings.find(b=>b.date===dt && b.slot===slot);
