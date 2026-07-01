@@ -86,7 +86,7 @@
     </div>
     <div class="stat s-day" style="cursor:default;min-width:150px">
       <div class="n" id="daysLeft">--</div>
-      <div class="l">يوم حتى التحكيم 30/6</div>
+      <div class="l">يوم حتى التحكيم 8/7</div>
     </div>
   </div>
   <div class="stats" id="statCards"></div>
@@ -205,11 +205,16 @@ async function load(){
   render();
 }
 
+function daysUntilJury(dateStr){
+  const end = new Date(dateStr + "T00:00:00");
+  return Math.max(0, Math.ceil((end - new Date()) / 864e5));
+}
+
 function render(){
   const m = DATA.meta;
   $("#subtitle").textContent = `محدَّث: ${new Date(m.cleanedAt).toLocaleString("ar-EG")} · المصدر: ${m.source}`;
-  $("#daysLeft").textContent = m.daysUntilJury;
-  $("#metaInfo").textContent = `تاريخ التحكيم: ${m.juryDate} · ${DATA.projects.length} مشروع`;
+  $("#daysLeft").textContent = daysUntilJury(m.juryDate);
+  $("#metaInfo").textContent = `تاريخ التحكيم: ${m.juryDateDisplay || m.juryDate} · ${DATA.projects.length} مشروع`;
 
   renderStatCards();
   renderCharts();
@@ -268,11 +273,17 @@ function renderCharts(){
 
 function renderAlerts(){
   const items = [];
+  if(DATA.meta.dcpPolicy){
+    items.push(`<div class="alert-item" style="border-color:var(--warn);background:rgba(232,179,57,.1)"><b>قرار اللجنة — DCP:</b> ${DATA.meta.dcpPolicy}</div>`);
+  }
+  if(DATA.meta.juryPostponed){
+    items.push(`<div class="alert-item" style="border-color:var(--cyan);background:rgba(63,193,201,.08)"><b>موعد التحكيم:</b> ${DATA.meta.juryPostponed}</div>`);
+  }
   const sr = DATA.soundReport;
   if(sr.no_engineer) items.push(`<div class="alert-item"><b>${sr.no_engineer} مشروع</b> جاهز للمكساج بلا مهندس صوت مُسند — يجب الإسناد فورًا.</div>`);
   if(sr.shooting_incomplete) items.push(`<div class="alert-item"><b>${sr.shooting_incomplete} مشروع</b> لم يكتمل تصويره — لا يمكن بدء المكساج.</div>`);
   const mixPending = DATA.projects.filter(p=>p.shootingDone && !p.mixDone).length;
-  if(mixPending) items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> بانتظار المكساج والتحكيم بعد ${DATA.meta.daysUntilJury} يومًا فقط.</div>`);
+  if(mixPending) items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> بانتظار المكساج والتحكيم بعد ${daysUntilJury(DATA.meta.juryDate)} يومًا فقط.</div>`);
   const heavy = DATA.soundReport.workload.filter(w=>w[1]>=2);
   heavy.forEach(([n,c])=> items.push(`<div class="alert-item">مهندس الصوت <b>${n}</b> محمّل بـ ${c} مشروعات — يُراعى عند الجدولة.</div>`));
   $("#alerts").innerHTML = items.join("") || '<p class="meta-foot">لا توجد تنبيهات حرجة حاليًا ✅</p>';

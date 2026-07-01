@@ -22,7 +22,9 @@ OUT_XLSX = Path(__file__).resolve().parent.parent / "data" / "tracker-cleaned.xl
 OUT_JSON = Path(__file__).resolve().parent.parent / "data" / "projects.json"
 DOWNLOAD_COPY = Path.home() / "Downloads" / "tracker-2026-cleaned.xlsx"
 
-JURY_DATE = "2026-06-30"
+JURY_DATE = "2026-07-08"
+JURY_DATE_AR = "8 يوليو 2026"
+DCP_POLICY = "بعد يوم 8 يوليو 2026 سيتم إخراج نسخة الـ DCP لكل المشاريع بغض النظر عن وضع شريط الصوت."
 INVALID_SOUND = {"", "—", "X", "x", "-", "–", None}
 
 # Status colors (ARGB for openpyxl)
@@ -212,7 +214,10 @@ def to_dashboard_json(projects: list[dict], sound: dict) -> dict:
         "meta": {
             "title": "مشروعات التخرج 2026",
             "juryDate": JURY_DATE,
+            "juryDateDisplay": JURY_DATE_AR,
             "daysUntilJury": days_left,
+            "juryPostponed": f"تم تأجيل التحكيم إلى {JURY_DATE_AR}.",
+            "dcpPolicy": DCP_POLICY,
             "cleanedAt": datetime.now().isoformat(timespec="seconds"),
             "source": str(SOURCE.name),
         },
@@ -268,7 +273,7 @@ def write_cleaned_xlsx(projects: list[dict], sound: dict):
 
     sound_rows = [
         ["تقرير قسم الصوت — مشروعات التخرج 2026"],
-        [f"محدّث: {datetime.now().strftime('%d/%m/%Y %H:%M')} · التحكيم: 30 يونيو 2026"],
+        [f"محدّث: {datetime.now().strftime('%d/%m/%Y %H:%M')} · التحكيم: {JURY_DATE_AR}"],
         [],
         ["المؤشر", "القيمة"],
         ["إجمالي المشروعات", sound["total"]],
@@ -330,7 +335,7 @@ def write_cleaned_xlsx(projects: list[dict], sound: dict):
     ws = wb["متابعة المشروعات"]
     ws.insert_rows(1, 2)
     ws["A1"] = "مشروعات التخرج 2026 — متابعة مراحل ما بعد الإنتاج (محدّث ومصحّح)"
-    ws["A2"] = "لجنة الإشراف · موعد التحكيم: 30 يونيو 2026"
+    ws["A2"] = f"لجنة الإشراف · موعد التحكيم: {JURY_DATE_AR}"
     ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=len(columns))
     ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=len(columns))
     style_cell(ws["A1"], COLORS["header"], bold=True, font_color=COLORS["header_font"])
