@@ -6,23 +6,26 @@
     "daysUntilJury": 7,
     "juryPostponed": "تم تأجيل التحكيم إلى 8 يوليو 2026.",
     "dcpPolicy": "بعد يوم 8 يوليو 2026 سيتم إخراج نسخة الـ DCP لكل المشاريع بغض النظر عن وضع شريط الصوت.",
-    "cleanedAt": "2026-06-27T14:06:11",
+    "cleanedAt": "2026-07-02T11:14:46",
     "source": "DOC-20260623-WA0055 tracker 7 (1) (3).xlsx"
   },
   "summary": {
-    "قيد التشطيب": 3,
-    "بانتظار المكساج": 16,
+    "قيد التشطيب": 6,
+    "بانتظار المكساج": 13,
     "التصوير غير مكتمل": 3
   },
   "soundReport": {
     "total": 22,
-    "mix_done": 3,
+    "mix_done": 6,
     "mix_done_projects": [
       "إن شاء الله خير",
       "ليلى",
-      "نسمة هوا"
+      "نص كفن",
+      "نسمة هوا",
+      "هابيل",
+      "نقطة تحول"
     ],
-    "ready_for_mix": 16,
+    "ready_for_mix": 13,
     "shooting_incomplete": 3,
     "no_engineer": 6,
     "no_engineer_projects": [
@@ -195,16 +198,18 @@
       "editor": "يحيى الشحري",
       "shootDates": "2/5 - 3/5",
       "shootingDone": true,
-      "mixDone": false,
+      "mixDone": true,
       "foleyReview": false,
       "foleyBooking": null,
       "foleyBooked": false,
-      "readiness": "بانتظار المكساج",
-      "currentStage": "—",
-      "notes": null,
-      "mixStart": null,
+      "readiness": "قيد التشطيب",
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (Atmos)",
+      "mixStart": "1/7",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "Atmos"
     },
     {
       "id": 6,
@@ -244,11 +249,13 @@
       "foleyBooking": null,
       "foleyBooked": false,
       "readiness": "قيد التشطيب",
-      "currentStage": "—",
-      "notes": null,
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (Atmos)",
       "mixStart": "7/6",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "Atmos"
     },
     {
       "id": 8,
@@ -305,16 +312,18 @@
       "editor": "عبد الرحمن",
       "shootDates": "23/4",
       "shootingDone": true,
-      "mixDone": false,
+      "mixDone": true,
       "foleyReview": false,
       "foleyBooking": "تم حجز بتاريخ 25/6 من الساعه ١ الي ٢",
       "foleyBooked": true,
-      "readiness": "بانتظار المكساج",
-      "currentStage": "—",
-      "notes": null,
-      "mixStart": null,
+      "readiness": "قيد التشطيب",
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (ستريو)",
+      "mixStart": "1/7",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "ستريو"
     },
     {
       "id": 11,
@@ -349,16 +358,18 @@
       "editor": "دينا حسن",
       "shootDates": "27/4",
       "shootingDone": true,
-      "mixDone": false,
+      "mixDone": true,
       "foleyReview": false,
       "foleyBooking": null,
       "foleyBooked": false,
-      "readiness": "بانتظار المكساج",
-      "currentStage": "—",
-      "notes": null,
-      "mixStart": null,
+      "readiness": "قيد التشطيب",
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (Atmos)",
+      "mixStart": "1/7",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "Atmos"
     },
     {
       "id": 13,
@@ -586,6 +597,36 @@
     "تصحيح جزر ورتوش: التصوير مكتمل — جاهزان للمكساج",
     "إعادة حساب الجاهزية للتحكيم من بيانات التصوير والمكساج",
     "تحديث تقرير الصوت: 3 مكساجات مكتملة (وليس 0)",
-    "توحيد أسماء مهندسي الصوت"
-  ]
+    "توحيد أسماء مهندسي الصوت",
+    "تحديث Master: هابيل (ستريو)، نقطة تحول (Atmos)، نص كفن (Atmos)، نسمة هوا (Atmos)",
+    "قدر من حبر (5.1) — جاهز للماستر يوم الأحد"
+  ],
+  "masterReport": {
+    "completed": [
+      {
+        "name": "هابيل",
+        "format": "ستريو"
+      },
+      {
+        "name": "نقطة تحول",
+        "format": "Atmos"
+      },
+      {
+        "name": "نص كفن",
+        "format": "Atmos"
+      },
+      {
+        "name": "نسمة هوا",
+        "format": "Atmos"
+      }
+    ],
+    "pending": [
+      {
+        "name": "قدر من حبر",
+        "format": "5.1",
+        "note": "جاهز للماستر يوم الأحد"
+      }
+    ],
+    "updatedAt": "2026-07-02T11:14:46"
+  }
 }

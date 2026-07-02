@@ -152,6 +152,8 @@
       <div id="noEngineer"></div>
       <h3>مكساج مكتمل</h3>
       <div id="mixDone"></div>
+      <h3>Master Files</h3>
+      <div id="masterReport"></div>
     </div>
     <div class="card">
       <h2>التصحيحات المُطبَّقة</h2>
@@ -221,6 +223,7 @@ function render(){
   renderAlerts();
   renderTable();
   renderSoundReport();
+  renderMasterReport();
   renderFixes();
   renderContacts();
   populateFilters();
@@ -301,7 +304,7 @@ function renderTable(){
     <td>${p.mixDone?chip("تم","c-ok"):chip("—","c-info")}</td>
     <td>${p.foleyReview?chip("✔","c-ok"):p.foleyBooked?chip("محجوز","c-finish"):chip("—","c-info")}</td>
     <td>${readinessChip(p.readiness)}</td>
-    <td style="font-size:.75rem;color:var(--mut)">${p.notes||p.foleyBooking||"—"}</td>
+    <td style="font-size:.75rem;color:var(--mut)">${p.masterDone?chip(`Master ${p.masterFormat} ✔`,"c-ok")+" ": ""}${p.notes||p.foleyBooking||"—"}</td>
   </tr>`).join("");
   applyFilters();
 }
@@ -359,6 +362,19 @@ function renderSoundReport(){
     </div>`;
   $("#noEngineer").innerHTML = sr.no_engineer_projects.map(p=>chip(p.name,"c-no")).join(" ") || "—";
   $("#mixDone").innerHTML = sr.mix_done_projects.map(n=>chip(n,"c-ok")).join(" ") || "—";
+}
+
+function renderMasterReport(){
+  const el = $("#masterReport");
+  if(!el) return;
+  const mr = DATA.masterReport;
+  if(!mr){
+    el.innerHTML = '<p class="meta-foot">—</p>';
+    return;
+  }
+  const done = (mr.completed||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
+  const pending = (mr.pending||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+" — "+x.note,"c-finish")}</span></div>`).join("");
+  el.innerHTML = (done + pending) || '<p class="meta-foot">—</p>';
 }
 
 function renderFixes(){
