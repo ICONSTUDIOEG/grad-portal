@@ -6,11 +6,13 @@
     "daysUntilJury": 7,
     "juryPostponed": "تم تأجيل التحكيم إلى 8 يوليو 2026.",
     "dcpPolicy": "بعد يوم 8 يوليو 2026 سيتم إخراج نسخة الـ DCP لكل المشاريع بغض النظر عن وضع شريط الصوت.",
-    "cleanedAt": "2026-07-06T19:53:19",
-    "source": "DOC-20260623-WA0055 tracker 7 (1) (3).xlsx"
+    "cleanedAt": "2026-07-06T20:02:31",
+    "source": "DOC-20260623-WA0055 tracker 7 (1) (3).xlsx",
+    "readyForJury": 8
   },
   "summary": {
-    "قيد التشطيب": 7,
+    "جاهز للتحكيم ✔": 6,
+    "قيد التشطيب": 1,
     "بانتظار المكساج": 12,
     "التصوير غير مكتمل": 3
   },
@@ -115,14 +117,15 @@
       "foleyReview": false,
       "foleyBooking": "21/6 الساعه 3",
       "foleyBooked": true,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (استيريو)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (استيريو) — تم 2026-07-06",
       "mixStart": "6/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "استيريو"
+      "masterFormat": "استيريو",
+      "masterDate": "2026-07-06"
     },
     {
       "id": 2,
@@ -205,14 +208,15 @@
       "foleyReview": false,
       "foleyBooking": null,
       "foleyBooked": false,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (Atmos)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (Atmos) — تم 2026-07-06",
       "mixStart": "1/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "Atmos"
+      "masterFormat": "Atmos",
+      "masterDate": "2026-07-06"
     },
     {
       "id": 6,
@@ -251,14 +255,15 @@
       "foleyReview": true,
       "foleyBooking": null,
       "foleyBooked": false,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (Atmos)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (Atmos) — تم 2026-07-05",
       "mixStart": "7/6",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "Atmos"
+      "masterFormat": "Atmos",
+      "masterDate": "2026-07-05"
     },
     {
       "id": 8,
@@ -319,14 +324,15 @@
       "foleyReview": false,
       "foleyBooking": "تم حجز بتاريخ 25/6 من الساعه ١ الي ٢",
       "foleyBooked": true,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (استيريو)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (استيريو) — تم 2026-07-04",
       "mixStart": "1/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "استيريو"
+      "masterFormat": "استيريو",
+      "masterDate": "2026-07-04"
     },
     {
       "id": 11,
@@ -365,14 +371,15 @@
       "foleyReview": false,
       "foleyBooking": null,
       "foleyBooked": false,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (Atmos)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (Atmos) — تم 2026-07-04",
       "mixStart": "1/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "Atmos"
+      "masterFormat": "Atmos",
+      "masterDate": "2026-07-04"
     },
     {
       "id": 13,
@@ -543,14 +550,15 @@
       "foleyReview": false,
       "foleyBooking": "atmos 28 30",
       "foleyBooked": true,
-      "readiness": "قيد التشطيب",
-      "currentStage": "Master ✔",
-      "notes": "تم عمل Master (Atmos)",
+      "readiness": "جاهز للتحكيم ✔",
+      "currentStage": "جاهز للتحكيم ✔",
+      "notes": "Master (Atmos) — تم 2026-07-05",
       "mixStart": "6/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "Atmos"
+      "masterFormat": "Atmos",
+      "masterDate": "2026-07-05"
     },
     {
       "id": 21,
@@ -604,47 +612,83 @@
     "تحديث تقرير الصوت: 3 مكساجات مكتملة (وليس 0)",
     "توحيد أسماء مهندسي الصوت",
     "تصحيح Master المؤكد: إن شاء الله خير، نص كفن، رتوش، نسمة هوا، هابيل، نقطة تحول",
-    "خارج الجدول: انت فينا (استيريو ✔)، قدر من حبر (5.1)"
+    "٦/٧: Master اليوم — انت فينا، إن شاء الله خير، نص كفن | أمس — رتوش، نسمة هوا | 8 أفلام جاهزة للتحكيم"
   ],
   "masterReport": {
+    "totalReady": 8,
+    "completedToday": [
+      {
+        "name": "انت فينا",
+        "format": "استيريو",
+        "note": "خارج جدول الـ22"
+      },
+      {
+        "name": "إن شاء الله خير",
+        "format": "استيريو",
+        "id": 1
+      },
+      {
+        "name": "نص كفن",
+        "format": "Atmos",
+        "id": 5
+      }
+    ],
+    "completedYesterday": [
+      {
+        "name": "رتوش",
+        "format": "Atmos",
+        "id": 20
+      },
+      {
+        "name": "نسمة هوا",
+        "format": "Atmos",
+        "id": 7
+      }
+    ],
     "completed": [
       {
         "id": 1,
         "name": "إن شاء الله خير",
-        "format": "استيريو"
+        "format": "استيريو",
+        "date": "2026-07-06"
       },
       {
         "id": 5,
         "name": "نص كفن",
-        "format": "Atmos"
+        "format": "Atmos",
+        "date": "2026-07-06"
       },
       {
         "id": 7,
         "name": "نسمة هوا",
-        "format": "Atmos"
+        "format": "Atmos",
+        "date": "2026-07-05"
       },
       {
         "id": 10,
         "name": "هابيل",
-        "format": "استيريو"
+        "format": "استيريو",
+        "date": "2026-07-04"
       },
       {
         "id": 12,
         "name": "نقطة تحول",
-        "format": "Atmos"
+        "format": "Atmos",
+        "date": "2026-07-04"
       },
       {
         "id": 20,
         "name": "رتوش",
-        "format": "Atmos"
+        "format": "Atmos",
+        "date": "2026-07-05"
       }
     ],
     "external": [
       {
         "name": "انت فينا",
         "format": "استيريو",
-        "status": "master_done",
-        "note": "خارج جدول الـ22"
+        "status": "ready_for_jury",
+        "note": "خارج جدول الـ22 — تم ٦/٧"
       },
       {
         "name": "قدر من حبر",
@@ -653,6 +697,6 @@
         "note": "خارج جدول الـ22"
       }
     ],
-    "updatedAt": "2026-07-06T19:53:19"
+    "updatedAt": "2026-07-06T20:02:31"
   }
 }

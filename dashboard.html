@@ -372,13 +372,29 @@ function renderMasterReport(){
     el.innerHTML = '<p class="meta-foot">—</p>';
     return;
   }
-  const done = (mr.completed||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id||"—"} ${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
-  const external = (mr.external||[]).map(x=>{
-    const label = x.status==="master_done" ? `${x.format} ✔` : x.format;
-    const cls = x.status==="master_done" ? "c-ok" : "c-info";
-    return `<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(label+" — "+x.note, cls)}</span></div>`;
-  }).join("");
-  el.innerHTML = (done + external) || '<p class="meta-foot">—</p>';
+  let html = "";
+  if(mr.totalReady){
+    const inTable = (mr.completed||[]).length;
+    html += `<p class="meta-foot" style="color:var(--ok);margin-bottom:10px"><b>${mr.totalReady} أفلام جاهزة للتحكيم</b> (${inTable} في الجدول + انت فينا خارج الجدول)</p>`;
+  }
+  if(mr.completedToday?.length){
+    html += `<h3 style="margin:8px 0 4px;font-size:.85rem;color:var(--gold)">تم اليوم ٦/٧</h3>`;
+    html += mr.completedToday.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.id?"#"+x.id+" ":""}${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
+  }
+  if(mr.completedYesterday?.length){
+    html += `<h3 style="margin:12px 0 4px;font-size:.85rem;color:var(--gold)">تم أمس ٥/٧</h3>`;
+    html += mr.completedYesterday.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id} ${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
+  }
+  if(mr.completed?.length){
+    html += `<h3 style="margin:12px 0 4px;font-size:.85rem;color:var(--mut)">كل الـ Master المكتمل</h3>`;
+    html += mr.completed.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id} ${x.name}</span><span class="cnt">${chip(x.format,"c-info")}</span></div>`).join("");
+  }
+  (mr.external||[]).forEach(x=>{
+    const cls = x.status==="ready_for_jury" ? "c-ok" : "c-info";
+    const suffix = x.status==="ready_for_jury" ? " ✔" : "";
+    html += `<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+suffix+" — "+x.note, cls)}</span></div>`;
+  });
+  el.innerHTML = html || '<p class="meta-foot">—</p>';
 }
 
 function renderFixes(){
