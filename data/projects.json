@@ -6,26 +6,27 @@
     "daysUntilJury": 7,
     "juryPostponed": "تم تأجيل التحكيم إلى 8 يوليو 2026.",
     "dcpPolicy": "بعد يوم 8 يوليو 2026 سيتم إخراج نسخة الـ DCP لكل المشاريع بغض النظر عن وضع شريط الصوت.",
-    "cleanedAt": "2026-07-02T11:14:46",
+    "cleanedAt": "2026-07-06T19:53:19",
     "source": "DOC-20260623-WA0055 tracker 7 (1) (3).xlsx"
   },
   "summary": {
-    "قيد التشطيب": 6,
-    "بانتظار المكساج": 13,
+    "قيد التشطيب": 7,
+    "بانتظار المكساج": 12,
     "التصوير غير مكتمل": 3
   },
   "soundReport": {
     "total": 22,
-    "mix_done": 6,
+    "mix_done": 7,
     "mix_done_projects": [
       "إن شاء الله خير",
       "ليلى",
       "نص كفن",
       "نسمة هوا",
       "هابيل",
-      "نقطة تحول"
+      "نقطة تحول",
+      "فيلم / رتوش"
     ],
-    "ready_for_mix": 13,
+    "ready_for_mix": 12,
     "shooting_incomplete": 3,
     "no_engineer": 6,
     "no_engineer_projects": [
@@ -115,11 +116,13 @@
       "foleyBooking": "21/6 الساعه 3",
       "foleyBooked": true,
       "readiness": "قيد التشطيب",
-      "currentStage": "مراجعة في الاستوديو الاستيريو",
-      "notes": "عمل مراجعة للفيلم مع الدكاتره ثم مع المخرج و تسليم الفيلم",
-      "mixStart": null,
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (استيريو)",
+      "mixStart": "6/7",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "استيريو"
     },
     {
       "id": 2,
@@ -318,12 +321,12 @@
       "foleyBooked": true,
       "readiness": "قيد التشطيب",
       "currentStage": "Master ✔",
-      "notes": "تم عمل Master (ستريو)",
+      "notes": "تم عمل Master (استيريو)",
       "mixStart": "1/7",
       "dcp": null,
       "dcpDate": null,
       "masterDone": true,
-      "masterFormat": "ستريو"
+      "masterFormat": "استيريو"
     },
     {
       "id": 11,
@@ -536,16 +539,18 @@
       "editor": "—",
       "shootDates": "14/5 - 15/5",
       "shootingDone": true,
-      "mixDone": false,
+      "mixDone": true,
       "foleyReview": false,
       "foleyBooking": "atmos 28 30",
       "foleyBooked": true,
-      "readiness": "بانتظار المكساج",
-      "currentStage": "—",
-      "notes": null,
-      "mixStart": null,
+      "readiness": "قيد التشطيب",
+      "currentStage": "Master ✔",
+      "notes": "تم عمل Master (Atmos)",
+      "mixStart": "6/7",
       "dcp": null,
-      "dcpDate": null
+      "dcpDate": null,
+      "masterDone": true,
+      "masterFormat": "Atmos"
     },
     {
       "id": 21,
@@ -598,35 +603,56 @@
     "إعادة حساب الجاهزية للتحكيم من بيانات التصوير والمكساج",
     "تحديث تقرير الصوت: 3 مكساجات مكتملة (وليس 0)",
     "توحيد أسماء مهندسي الصوت",
-    "تحديث Master: هابيل (ستريو)، نقطة تحول (Atmos)، نص كفن (Atmos)، نسمة هوا (Atmos)",
-    "قدر من حبر (5.1) — جاهز للماستر يوم الأحد"
+    "تصحيح Master المؤكد: إن شاء الله خير، نص كفن، رتوش، نسمة هوا، هابيل، نقطة تحول",
+    "خارج الجدول: انت فينا (استيريو ✔)، قدر من حبر (5.1)"
   ],
   "masterReport": {
     "completed": [
       {
-        "name": "هابيل",
-        "format": "ستريو"
+        "id": 1,
+        "name": "إن شاء الله خير",
+        "format": "استيريو"
       },
       {
-        "name": "نقطة تحول",
-        "format": "Atmos"
-      },
-      {
+        "id": 5,
         "name": "نص كفن",
         "format": "Atmos"
       },
       {
+        "id": 7,
         "name": "نسمة هوا",
+        "format": "Atmos"
+      },
+      {
+        "id": 10,
+        "name": "هابيل",
+        "format": "استيريو"
+      },
+      {
+        "id": 12,
+        "name": "نقطة تحول",
+        "format": "Atmos"
+      },
+      {
+        "id": 20,
+        "name": "رتوش",
         "format": "Atmos"
       }
     ],
-    "pending": [
+    "external": [
+      {
+        "name": "انت فينا",
+        "format": "استيريو",
+        "status": "master_done",
+        "note": "خارج جدول الـ22"
+      },
       {
         "name": "قدر من حبر",
         "format": "5.1",
-        "note": "جاهز للماستر يوم الأحد"
+        "status": "outside_table",
+        "note": "خارج جدول الـ22"
       }
     ],
-    "updatedAt": "2026-07-02T11:14:46"
+    "updatedAt": "2026-07-06T19:53:19"
   }
 }

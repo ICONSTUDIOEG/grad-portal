@@ -372,9 +372,13 @@ function renderMasterReport(){
     el.innerHTML = '<p class="meta-foot">—</p>';
     return;
   }
-  const done = (mr.completed||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
-  const pending = (mr.pending||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+" — "+x.note,"c-finish")}</span></div>`).join("");
-  el.innerHTML = (done + pending) || '<p class="meta-foot">—</p>';
+  const done = (mr.completed||[]).map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id||"—"} ${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
+  const external = (mr.external||[]).map(x=>{
+    const label = x.status==="master_done" ? `${x.format} ✔` : x.format;
+    const cls = x.status==="master_done" ? "c-ok" : "c-info";
+    return `<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(label+" — "+x.note, cls)}</span></div>`;
+  }).join("");
+  el.innerHTML = (done + external) || '<p class="meta-foot">—</p>';
 }
 
 function renderFixes(){
