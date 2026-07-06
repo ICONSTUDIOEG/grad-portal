@@ -197,20 +197,54 @@ function readinessChip(r){
   return chip(r, cls);
 }
 
-async function load(){
-  const [projectsRes, contactsRes, stateRes] = await Promise.all([
-    fetch("data/projects.json"),
-    fetch("data/contacts.json"),
-    fetch("/api/state", {cache:"no-store"}).catch(()=>null),
-  ]);
-  DATA = await projectsRes.json();
-  CONTACTS = await contactsRes.json();
-  if(stateRes?.ok){
-    const state = await stateRes.json();
-    if(state.projects?.length) DATA.projects = state.projects;
-    if(state.meta) DATA.meta = {...DATA.meta, ...state.meta};
+function applyPortalState(state){
+  if(!state) return;
+  if(state.meta) DATA.meta = {...DATA.meta, ...state.meta};
+  const portal = state.projects;
+  if(!Array.isArray(portal) || !portal.length) return;
+  portal.forEach(sp=>{
+    const p = DATA.projects.find(x=>x.id===sp.id);
+    if(!p) return;
+    if(sp.idx >= 6){
+      p.readiness = "جاهز للتحكيم ✔";
+      p.currentStage = "جاهز للتحكيم ✔";
+      p.mixDone = true;
+    }
+    if(sp.master || sp.masterFormat){
+      const fmt = sp.master || sp.masterFormat;
+      p.masterDone = true;
+      p.masterFormat = fmt;
+      p.notes = sp.committeeNote || p.notes || `Master (${fmt})`;
+    }
+    if(sp.committeeNote) p.notes = sp.committeeNote;
+  });
+  if(state.meta?.readyForJury != null){
+    const readyN = state.meta.readyForJury;
+    const inTable = DATA.projects.filter(p=>p.readiness?.includes("جاهز")).length;
+    if(!DATA.summary) DATA.summary = {};
+    DATA.summary["جاهز للتحكيم ✔"] = Math.max(inTable, readyN - (state.meta.externalReady?.length || 0));
   }
-  render();
+}
+
+async function load(){
+  try{
+    const [projectsRes, contactsRes, stateRes] = await Promise.all([
+      fetch("data/projects.json"),
+      fetch("data/contacts.json"),
+      fetch("/api/state", {cache:"no-store"}).catch(()=>null),
+    ]);
+    if(!projectsRes.ok) throw new Error("projects.json HTTP "+projectsRes.status);
+    DATA = await projectsRes.json();
+    CONTACTS = contactsRes.ok ? await contactsRes.json() : null;
+    if(stateRes?.ok){
+      applyPortalState(await stateRes.json());
+    }
+    render();
+  }catch(e){
+    console.error(e);
+    $("#subtitle").textContent = "تعذّر تحميل البيانات — حدّث الصفحة أو تحقق من الاتصال";
+    $("#alerts").innerHTML = `<div class="alert-item"><b>خطأ تحميل:</b> ${e.message}</div>`;
+  }
 }
 
 function daysUntilJury(dateStr){
@@ -219,8 +253,9 @@ function daysUntilJury(dateStr){
 }
 
 function render(){
-  const m = DATA.meta;
-  $("#subtitle").textContent = `محدَّث: ${new Date(m.cleanedAt).toLocaleString("ar-EG")} · المصدر: ${m.source}`;
+  if(!DATA?.projects?.length) return;
+  const m = DATA.meta || {};
+  $("#subtitle").textContent = `محدَّث: ${m.cleanedAt ? new Date(m.cleanedAt).toLocaleString("ar-EG") : "—"} · المصدر: ${m.source || "projects.json"}`;
   $("#daysLeft").textContent = daysUntilJury(m.juryDate);
   $("#metaInfo").textContent = `تاريخ التحكيم: ${m.juryDateDisplay || m.juryDate} · ${DATA.projects.length} مشروع`;
 
