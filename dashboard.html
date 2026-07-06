@@ -198,12 +198,18 @@ function readinessChip(r){
 }
 
 async function load(){
-  const [projectsRes, contactsRes] = await Promise.all([
+  const [projectsRes, contactsRes, stateRes] = await Promise.all([
     fetch("data/projects.json"),
     fetch("data/contacts.json"),
+    fetch("/api/state", {cache:"no-store"}).catch(()=>null),
   ]);
   DATA = await projectsRes.json();
   CONTACTS = await contactsRes.json();
+  if(stateRes?.ok){
+    const state = await stateRes.json();
+    if(state.projects?.length) DATA.projects = state.projects;
+    if(state.meta) DATA.meta = {...DATA.meta, ...state.meta};
+  }
   render();
 }
 
@@ -374,8 +380,9 @@ function renderMasterReport(){
   }
   let html = "";
   if(mr.totalReady){
+    const ext = (DATA.meta?.externalReady||[]).map(x=>x.name).join("، ") || "انت فين";
     const inTable = (mr.completed||[]).length;
-    html += `<p class="meta-foot" style="color:var(--ok);margin-bottom:10px"><b>${mr.totalReady} أفلام جاهزة للتحكيم</b> (${inTable} في الجدول + انت فينا خارج الجدول)</p>`;
+    html += `<p class="meta-foot" style="color:var(--ok);margin-bottom:10px"><b>${DATA.meta?.readyForJury || mr.totalReady} أفلام جاهزة للتحكيم</b> (${inTable} في الجدول + ${ext} خارج الجدول)</p>`;
   }
   if(mr.completedToday?.length){
     html += `<h3 style="margin:8px 0 4px;font-size:.85rem;color:var(--gold)">تم اليوم ٦/٧</h3>`;

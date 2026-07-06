@@ -86,6 +86,8 @@ class Handler(BaseHTTPRequestHandler):
             current["projects"] = incoming["projects"]
         if "professors" in incoming and isinstance(incoming["professors"], list):
             current["professors"] = incoming["professors"]
+        if "meta" in incoming and isinstance(incoming["meta"], dict):
+            current["meta"] = {**(current.get("meta") or {}), **incoming["meta"]}
         from datetime import datetime, timezone
 
         current["version"] = 1

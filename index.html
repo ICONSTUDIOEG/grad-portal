@@ -92,6 +92,7 @@
   <button data-p="update">✏️ تحديث مرحلة</button>
   <button data-p="booking">🎙️ حجز استوديو الفولي</button>
   <button data-p="board">👨‍🏫 لوحة الإشراف</button>
+  <button data-p="committee">🔧 تحديث اللجنة</button>
   <a href="dashboard.html" style="margin-right:auto;background:var(--card);color:var(--cyan);border:1px solid var(--line);border-radius:10px;padding:10px 18px;font-size:.92rem;text-decoration:none">📊 التقرير التفاعلي</a>
 </nav>
 
@@ -194,6 +195,36 @@
       </div>
     </div>
   </section>
+
+  <section class="panel" id="p-committee">
+    <div class="card" style="max-width:640px;margin:0 auto">
+      <h3>🔧 تحديث اللجنة — حفظ مباشر على الموقع</h3>
+      <p class="note" style="margin-top:0">يمكن لأعضاء اللجنة تعديل الحالة هنا دون الرجوع للمطوّر. التغييرات تُحفظ فورًا وتظهر لجميع الزوار.</p>
+      <label>اسمك (للتوثيق)</label>
+      <input id="cName" placeholder="عضو اللجنة">
+      <label>المشروع</label>
+      <select id="cProject"></select>
+      <label>المرحلة</label>
+      <select id="cStage">
+        <option value="0">تصوير</option>
+        <option value="1">مونتاج</option>
+        <option value="2">الفولي</option>
+        <option value="3">مراجعة استيريو</option>
+        <option value="4">المكساج النهائي</option>
+        <option value="5">DCP</option>
+        <option value="6">جاهز للتحكيم ✔</option>
+      </select>
+      <label>صيغة الـ Master (اختياري)</label>
+      <input id="cMaster" placeholder="مثال: Atmos / استيريو / 5.1">
+      <label>ملاحظات</label>
+      <textarea id="cNote" rows="2" placeholder="مثال: تم عمل Master اليوم"></textarea>
+      <label>عدد الأفلام الجاهزة للتحكيم (يشمل خارج الـ22)</label>
+      <input type="number" id="cReadyCount" min="0" max="30" value="8">
+      <p class="note">خارج الجدول: <b>انت فين</b> (استيريو) — يُحسب ضمن العدد أعلاه</p>
+      <button class="btn" id="cSave">💾 حفظ على الخادم</button>
+      <p class="note">بعد الحفظ حدّث الصفحة للتأكد. التقرير التفاعلي يقرأ من نفس الخادم عند فتحه.</p>
+    </div>
+  </section>
 </main>
 
 <div class="toast" id="toast"></div>
@@ -206,6 +237,11 @@ const CONFIG = {
   MIN_HOURS: 24,
   JURY_DATE: "2026-07-08",
   POLL_MS: 20000
+};
+
+const DEFAULT_META = {
+  readyForJury: 8,
+  externalReady: [{name: "انت فين", format: "استيريو"}]
 };
 
 const SLOTS = [
@@ -250,7 +286,7 @@ const PROFESSORS = [
   {name:"فيروز طارق",   phone:"+201146655510", email:"fayrouz8889@gmail.com"}
 ];
 
-let DATA = { projects: JSON.parse(JSON.stringify(SEED)), professors: PROFESSORS, bookings: [] };
+let DATA = { projects: JSON.parse(JSON.stringify(SEED)), professors: PROFESSORS, bookings: [], meta: JSON.parse(JSON.stringify(DEFAULT_META)) };
 let CONTACTS = null;
 let LIVE = false;
 let saving = false;
@@ -262,6 +298,7 @@ function applyRemoteState(remote){
   if(remote?.projects?.length) DATA.projects = remote.projects;
   DATA.bookings = Array.isArray(remote?.bookings) ? remote.bookings : [];
   DATA.professors = remote?.professors?.length ? remote.professors : PROFESSORS;
+  if(remote?.meta) DATA.meta = {...DEFAULT_META, ...remote.meta};
 }
 
 async function loadState(){
@@ -280,7 +317,8 @@ async function saveState(){
       body: JSON.stringify({
         projects: DATA.projects,
         bookings: DATA.bookings,
-        professors: DATA.professors
+        professors: DATA.professors,
+        meta: DATA.meta
       })
     });
     if(!r.ok) throw new Error("save HTTP "+r.status);
@@ -407,11 +445,19 @@ function renderContacts(){
     </div>`).join("");
 }
 
+function juryReadyCount(){
+  if(DATA.meta?.readyForJury != null) return DATA.meta.readyForJury;
+  const ext = (DATA.meta?.externalReady || []).length;
+  return DATA.projects.filter(p=>p.idx>=6).length + ext;
+}
+
 function renderStats(){
-  $("#stReady").textContent = DATA.projects.filter(p=>p.idx>=6).length;
+  $("#stReady").textContent = juryReadyCount();
   $("#stActive").textContent = DATA.projects.filter(p=>p.shot && p.idx>0 && p.idx<6).length;
   $("#stShoot").textContent = DATA.projects.filter(p=>!p.shot).length;
   $("#days").textContent = Math.max(0, Math.ceil((new Date(CONFIG.JURY_DATE)-new Date())/864e5));
+  const rc = $("#cReadyCount");
+  if(rc && DATA.meta?.readyForJury != null) rc.value = DATA.meta.readyForJury;
 }
 
 function stageChip(p){
@@ -440,11 +486,45 @@ function renderProjects(){
 }
 
 function fillSelects(){
-  ["#uProject","#bProject"].forEach(sel=>{
-    const el=$(sel); el.innerHTML="";
+  ["#uProject","#bProject","#cProject"].forEach(sel=>{
+    const el=$(sel); if(!el) return;
+    el.innerHTML="";
     DATA.projects.forEach(p=> el.insertAdjacentHTML("beforeend",`<option value="${p.id}">${p.id} — ${p.t}</option>`));
   });
+  syncCommitteeForm();
 }
+
+function syncCommitteeForm(){
+  const el = $("#cProject"); if(!el || !el.value) return;
+  const p = DATA.projects.find(x=>x.id===+el.value);
+  if(!p) return;
+  $("#cStage").value = String(p.idx ?? 0);
+  $("#cMaster").value = p.master || "";
+  $("#cNote").value = p.committeeNote || p.notes || "";
+}
+$("#cProject")?.addEventListener("change", syncCommitteeForm);
+
+$("#cSave")?.addEventListener("click", async ()=>{
+  if(!$("#cName").value.trim()) return toast("اكتب اسمك أولًا", false);
+  const p = DATA.projects.find(x=>x.id===+$("#cProject").value);
+  if(!p) return;
+  const idx = +$("#cStage").value;
+  const master = $("#cMaster").value.trim();
+  const note = $("#cNote").value.trim();
+  p.idx = idx;
+  if(idx > 0) p.shot = true;
+  if(idx >= 6) p.foley = true;
+  if(master){ p.master = master; p.masterDone = true; p.masterFormat = master; }
+  if(note) p.committeeNote = note;
+  DATA.meta.readyForJury = +$("#cReadyCount").value || juryReadyCount();
+  DATA.meta.externalReady = DEFAULT_META.externalReady;
+  DATA.meta.lastEdit = {by: $("#cName").value.trim(), at: new Date().toISOString()};
+  try{
+    await saveState();
+    renderAll();
+    toast("✅ تم الحفظ على الخادم — يظهر للجميع فورًا");
+  }catch(e){ toast("تعذّر الحفظ — تحقق من الاتصال", false); }
+});
 
 function renderPipe(){
   const p = DATA.projects.find(x=>x.id===+($("#uProject").value||1));
@@ -612,9 +692,10 @@ load();
 setInterval(async ()=>{
   try{
     const state = await loadState();
-    const prev = JSON.stringify(DATA.bookings);
+    const snap = s=>({b:s.bookings,m:s.meta?.readyForJury,p:s.projects?.map(x=>x.idx)});
+    const prev = JSON.stringify(snap(DATA));
     applyRemoteState(state);
-    if(JSON.stringify(DATA.bookings)!==prev) renderAll();
+    if(JSON.stringify(snap(DATA))!==prev) renderAll();
     else if(!LIVE){ LIVE = true; $("#liveBanner").style.display="none"; updateSyncNote(); }
   }catch(_){}
 }, CONFIG.POLL_MS);
