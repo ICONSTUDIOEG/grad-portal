@@ -37,6 +37,7 @@ services:
         wget -qO /usr/share/nginx/html/index.html "${GITHUB_RAW_BASE}/index.html?${rev}"
         wget -qO /usr/share/nginx/html/dashboard.html "${GITHUB_RAW_BASE}/dashboard.html?${rev}"
         wget -qO /usr/share/nginx/html/presentation.html "${GITHUB_RAW_BASE}/presentation.html?${rev}"
+        wget -qO /usr/share/nginx/html/balance-simulation.html "${GITHUB_RAW_BASE}/balance-simulation.html?${rev}"
         wget -qO /usr/share/nginx/html/data/projects.json "${GITHUB_RAW_BASE}/data/projects.json?${rev}"
         wget -qO /usr/share/nginx/html/data/contacts.json "${GITHUB_RAW_BASE}/data/contacts.json?${rev}"
         wget -qO /usr/share/nginx/html/data/tracker-cleaned.xlsx "${GITHUB_RAW_BASE}/data/tracker-cleaned.xlsx?${rev}"
@@ -115,7 +116,7 @@ EOF
 
 if [[ "$MODE" == "github" ]]; then
   echo "Using GitHub raw: ${GITHUB_RAW_BASE}"
-  for path in index.html dashboard.html presentation.html api/state-server.py data/projects.json data/contacts.json data/portal-state.json data/tracker-cleaned.xlsx; do
+  for path in index.html dashboard.html presentation.html balance-simulation.html api/state-server.py data/projects.json data/contacts.json data/portal-state.json data/tracker-cleaned.xlsx; do
   code=$(curl -sS -o /dev/null -w "%{http_code}" "${GITHUB_RAW_BASE}/${path}")
   if [[ "$code" != "200" ]]; then
     echo "ERROR: GitHub file not found (${code}): ${GITHUB_RAW_BASE}/${path}" >&2

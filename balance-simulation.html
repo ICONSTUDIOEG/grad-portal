@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>محاكاة توازن الأقسام — المعهد العالي للسينما</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f14; --panel:#161a22; --panel2:#1d222d; --line:#2a3142;
+  --gold:#d9a441; --gold2:#f0c46c; --red:#e05252; --green:#4caf7d; --amber:#e0a852;
+  --txt:#e8e6e0; --dim:#9aa0ad; --blue:#5b8dd9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Tajawal',sans-serif;line-height:1.7}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 80px}
+header{border-bottom:1px solid var(--line);padding:28px 0 20px;margin-bottom:28px}
+header h1{font-size:30px;font-weight:900;color:var(--gold2)}
+header p{color:var(--dim);margin-top:6px;font-size:15px}
+.badge{display:inline-block;background:#242a38;border:1px solid var(--line);border-radius:20px;padding:2px 14px;font-size:13px;color:var(--gold);margin-left:8px}
+section{margin-bottom:42px}
+h2{font-size:22px;font-weight:700;color:var(--gold);margin-bottom:14px;border-right:4px solid var(--gold);padding-right:12px}
+h3{font-size:17px;font-weight:700;margin:18px 0 8px;color:var(--gold2)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:center}
+th{background:var(--panel2);color:var(--gold2);font-weight:700}
+td.dept{text-align:right;font-weight:700}
+tr.weak td{background:rgba(224,82,82,.08)}
+tr.over td{background:rgba(76,175,125,.06)}
+.note{font-size:13px;color:var(--dim);margin-top:10px}
+.bar-row{display:flex;align-items:center;gap:10px;margin:7px 0}
+.bar-label{width:150px;font-size:13.5px;font-weight:700;flex-shrink:0}
+.bar-track{flex:1;background:#232838;border-radius:6px;height:22px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:700;color:#0d0f14;min-width:fit-content;transition:width .4s}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+@media(max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.kpi .v{font-size:28px;font-weight:900;color:var(--gold2)}
+.kpi .l{font-size:12.5px;color:var(--dim)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:820px){.controls{grid-template-columns:1fr}}
+.lever{margin-bottom:18px}
+.lever label{display:flex;justify-content:space-between;font-weight:700;font-size:14.5px;margin-bottom:4px}
+.lever label span.val{color:var(--gold2)}
+.lever input[type=range]{width:100%;accent-color:var(--gold)}
+.lever .hint{font-size:12.5px;color:var(--dim)}
+input[type=number]{width:70px;background:#0f1219;border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 6px;font-family:inherit;font-size:14px;text-align:center}
+.pill{display:inline-block;border-radius:12px;padding:1px 10px;font-size:12px;font-weight:700}
+.p-red{background:rgba(224,82,82,.18);color:#ff8a8a}
+.p-amber{background:rgba(224,168,82,.18);color:#f0c46c}
+.p-green{background:rgba(76,175,125,.18);color:#7fd8ab}
+.diag{border-right:4px solid var(--red);background:rgba(224,82,82,.06);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.diag b{color:#ff9d9d}
+.sol{border-right:4px solid var(--green);background:rgba(76,175,125,.06);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.sol b{color:#7fd8ab}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab-btn{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:10px 10px 0 0;padding:8px 20px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.tab-btn.active{color:var(--gold2);border-bottom:2px solid var(--gold);background:var(--panel)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+ol.plan{padding-right:22px}
+ol.plan li{margin-bottom:10px;font-size:14.5px}
+ol.plan li b{color:var(--gold2)}
+.footer-note{font-size:12.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:14px;margin-top:30px}
+.src{font-size:12px;color:#6d7482}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>محاكاة توازن الأقسام <span class="badge">المعهد العالي للسينما — أكاديمية الفنون</span></h1>
+  <p>تشخيص وحل مشكلة ضعف الإقبال على أقسام هندسة الصوت والرسوم المتحركة وهندسة المناظر (الديكور) مقابل تكدّس الإخراج والتصوير — مبنية على البيانات الرسمية للقيد 2023/2024 و2024/2025 وشروط القبول المنشورة على hic.aoa.edu.eg</p>
+</header>
+
+<!-- ============ 1. الواقع بالأرقام ============ -->
+<section>
+<h2>أولاً: الواقع بالأرقام الرسمية</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>إجمالي المقيدين 2023/2024 (معتمد + موازي)</h3>
+    <div id="chart-total"></div>
+    <p class="note src">المصدر: بيان أعداد الطلاب المقيدين — اعتماد أ.د/ إيمان يونس، عميد المعهد. الإجمالي 757 طالباً (345 معتمد + 412 موازي).</p>
+  </div>
+  <div class="card">
+    <h3>مؤشر الطلب الحقيقي: موازي الفرقة الأولى 2023/2024</h3>
+    <div id="chart-parallel"></div>
+    <p class="note">التعليم الموازي بمصروفات ودون شرط مجموع أو سن — أي أن هذه الأرقام تعكس <b style="color:var(--gold2)">اختيار الطالب الحر</b> عندما لا تحدّه أي قيود. صوت: 3 طلاب فقط. تصوير وإخراج: 18 لكلٍّ منهما. الفجوة ×6.</p>
+  </div>
+</div>
+<div class="card" style="margin-top:18px">
+  <h3>الفرقة الأولى — التعليم المعتمد 2024/2025</h3>
+  <table>
+    <tr><th>القسم</th><th>سيناريو</th><th>إخراج</th><th>مونتاج</th><th>إنتاج</th><th>صوت</th><th>ديكور</th><th>رسوم متحركة</th><th>تصوير</th></tr>
+    <tr><td class="dept">مقيدون</td><td>8</td><td>8</td><td>10</td><td>8</td><td>9</td><td>8</td><td style="color:#ff8a8a;font-weight:900">5</td><td>10</td></tr>
+  </table>
+  <p class="note">مع إفادتكم بأن أعداد 2025/2026 جاءت أقل من الأعوام السابقة مع زيادة في التصوير — الاتجاه هابط في القاع أصلاً.</p>
+</div>
+<div class="card" style="margin-top:18px">
+  <h3>المتقدمون الفعليون لاختبار القدرات — دورة 2025/2026 <span class="pill p-green">أرقام رسمية من كشوف أرقام الجلوس (16 كشفاً)</span></h3>
+  <div class="grid2">
+    <div><h3 style="margin-top:4px">التعليم المعتمد — 348 متقدماً</h3><div id="chart-app26"></div></div>
+    <div><h3 style="margin-top:4px">التعليم الموازي — 193 متقدماً</h3><div id="chart-app26p"></div></div>
+  </div>
+  <p class="note src">المصدر: كشوف أرقام جلوس اختبار القدرات الإبداعية والمعلومات العامة — وزارة الثقافة، أكاديمية الفنون. إجمالي قمع المعهد الكامل: <b style="color:var(--gold2)">541 متقدماً</b>. أبرز إشارتين: <b style="color:#ff8a8a">الرسوم المتحركة جذبت متقدمَين اثنين فقط للموازي</b> — القسم خرج فعلياً من السوق المدفوع؛ والتصوير تجاوز الإخراج (79 مقابل 45 موازي) — الجيل الجديد يتجه للكاميرا لا للكرسي.</p>
+</div>
+</section>
+
+<!-- ============ 2. التشخيص ============ -->
+<section>
+<h2>ثانياً: التشخيص الصريح</h2>
+<div class="diag"><b>الثغرة 1 — المشكلة ليست في شروط القبول.</b> الشروط المنشورة متطابقة حرفياً للأقسام الثمانية: 55% ثانوية عامة، نفس السن، نفس المظروف (1000ج معتمد / 2000ج موازي). أي حل يبدأ من "تخفيف الشروط" للأقسام الضعيفة يعالج باباً لا يقف أمامه أحد. المشكلة في الطلب لا في البوابة.</div>
+<div class="diag"><b>الثغرة 2 — مشكلة صورة ذهنية ووعي مهني.</b> الطالب في سن 17 يعرف "المخرج" و"مدير التصوير" من الشاشة، ولا يعرف أن مهندس الصوت ومصمم الرسوم المتحركة ومهندس المناظر هم أعلى التخصصات طلباً في سوق المنصات والإعلانات والألعاب اليوم. القسم الأضعف قيداً (صوت: 72 طالباً في الفرق الأربع) هو الأقوى سوقاً — وهذه مفارقة تسويقية لا أكاديمية.</div>
+<div class="diag"><b>الثغرة 3 — الفائض يُهدر بدل أن يُعاد توجيهه.</b> كشوف 2025/2026 الرسمية: 177 متقدماً للإخراج والتصوير يتنافسون على ~20 مقعداً معتمداً، أي أن نحو 150 طالباً اجتذبتهم السينما فعلاً ثم غادروا المنظومة كلياً — بينما صوت عند 20 متقدماً فقط ورسوم عند 23. لا توجد آلية "رغبة ثانية" مؤسسية في يوم الاختبار، وهي أرخص حل متاح وأسرعه أثراً.</div>
+<div class="diag"><b>الثغرة 4 — القمع الكلي ينكمش.</b> 348 متقدماً للمعهد بأكمله (معتمد 2025/2026). إعادة توزيع كعكة تتقلص لن تنقذ الأقسام الضعيفة على المدى البعيد؛ الحل البنيوي هو توسيع القمع نفسه — وهذا دور حملات التوعية والشراكات لا القرارات الإدارية.</div>
+</section>
+
+<!-- ============ 3. المحاكاة ============ -->
+<section>
+<h2>ثالثاً: نموذج المحاكاة التفاعلي</h2>
+<div class="card">
+  <h3>مدخلات المتقدمين والمقاعد <span class="pill p-green">أعداد المتقدمين رسمية كاملة — كشوف أرقام الجلوس 2025/2026 (معتمد + موازي)</span></h3>
+  <table id="input-table">
+    <tr><th>القسم</th><th>متقدمو المعتمد</th><th>متقدمو الموازي</th><th>مقاعد معتمد</th><th>مقاعد موازي</th><th>الحالة</th></tr>
+  </table>
+  <div class="lever" style="margin-top:16px;max-width:420px">
+    <label>نسبة الاجتياز والقيد الفعلي <span class="val" id="v-pass">45%</span></label>
+    <input type="range" id="l-pass" min="20" max="100" value="45">
+    <div class="hint">نسبة المتقدمين الذين يجتازون الاختبارات والكشف الطبي <b>ويقيّدون فعلاً</b>. معايرة من الواقع: رسوم متحركة 24/25 قيّدت 5 من 23 متقدماً (~22%)، صوت 9 من ~20 (~45%) — جرّب خفضها لترى هشاشة الوضع</div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:18px">
+  <h3>روافع الحل — حرّكها وشاهد الأثر فوراً</h3>
+  <div class="controls">
+    <div>
+      <div class="lever">
+        <label>① حملات التوعية والأيام المفتوحة <span class="val" id="v-l1">0%</span></label>
+        <input type="range" id="l1" min="0" max="100" value="0">
+        <div class="hint">فيديوهات مسارات مهنية، زيارات مدارس، أيام مفتوحة بالمعامل — ترفع المتقدمين للأقسام الثلاثة الضعيفة حتى +120% عند أقصى جهد. <b>تحذير: أثرها الكامل يحتاج دورتين إلى ثلاث دورات قبول.</b></div>
+      </div>
+      <div class="lever">
+        <label>② إعادة توجيه فائض الإخراج والتصوير <span class="val" id="v-l2">0%</span></label>
+        <input type="range" id="l2" min="0" max="60" value="0">
+        <div class="hint">نسبة المؤهلين المرفوضين لضيق المقاعد الذين يقبلون عرض "رغبة ثانية" في قسم شاغر بنفس يوم الاختبار. <b>هذه أسرع رافعة وأرخصها — أثرها من أول عام.</b></div>
+      </div>
+    </div>
+    <div>
+      <div class="lever">
+        <label>③ حوافز الموازي للأقسام الشحيحة <span class="val" id="v-l3">0%</span></label>
+        <input type="range" id="l3" min="0" max="100" value="0">
+        <div class="hint">منح جزئية أو خصم مصروفات موازي لأقسام الصوت والرسوم والديكور، وشراكات استوديوهات ترعى طلاباً — ترفع إقبال الموازي حتى +80%.</div>
+      </div>
+      <div class="kpis" style="grid-template-columns:1fr 1fr">
+        <div class="kpi"><div class="v" id="k-empty">—</div><div class="l">مقاعد شاغرة (بعد الحل)</div></div>
+        <div class="kpi"><div class="v" id="k-empty0">—</div><div class="l">مقاعد شاغرة (الوضع الحالي)</div></div>
+        <div class="kpi"><div class="v" id="k-intake">—</div><div class="l">طلاب الفرقة الأولى (بعد)</div></div>
+        <div class="kpi"><div class="v" id="k-lost">—</div><div class="l">مؤهلون مهدرون (بعد)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:18px">
+  <h3>نتيجة المحاكاة: نسبة امتلاء كل قسم</h3>
+  <p class="note" style="border-right:3px solid var(--gold);padding-right:10px;margin-bottom:12px"><b style="color:var(--gold2)">خلاصة الأرقام الرسمية الكاملة:</b> الأزمة أزمتان مختلفتان. <b>المعتمد هش:</b> يمتلئ ظاهرياً بمقاعده المحدودة لكن أي انخفاض في نسبة القيد الفعلي (جرّب 35%) يكشف العجز. <b>الموازي منهار في القاع:</b> رسوم متحركة 2 متقدمان وصوت 10 لعشرين مقعداً — بينما التصوير وحده جذب 79. الموازي هو مصدر الإيراد بالمصروفات، فكل مقعد موازي شاغر في هذه الأقسام خسارة مالية مباشرة ومتجددة أربع سنوات. لاحظ أيضاً أن رافعة إعادة التوجيه تعمل في الموازي بقوة: فائض تصوير وإخراج الموازي (~65 مؤهلاً) يكفي لملء عجز الأقسام الثلاثة كاملاً.</p>
+  <div id="chart-result"></div>
+  <table id="result-table" style="margin-top:14px">
+    <tr><th>القسم</th><th>مؤهلون بعد الروافع</th><th>محوّلون إليه</th><th>معتمد</th><th>موازي</th><th>امتلاء كلي</th><th>الحكم</th></tr>
+  </table>
+</div>
+</section>
+
+<!-- ============ 4. خطة العمل ============ -->
+<section>
+<h2>رابعاً: خطة العمل المزدوجة</h2>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab(0,this)">مستوى مجلس المعهد (قرارات)</button>
+  <button class="tab-btn" onclick="showTab(1,this)">مستوى جذب الطلاب (تسويق)</button>
+</div>
+<div class="tab-content active card">
+  <ol class="plan">
+    <li><b>آلية الرغبة الثانية المؤسسية:</b> إقرار بند في قواعد امتحانات القبول يتيح للمتقدم المجتاز اختبارات الإخراج/التصوير غير المقبول لضيق المقاعد أن يُعرض عليه فوراً مقعد في صوت/رسوم/ديكور دون مظروف جديد ودون اختبار كامل جديد (اختبار تخصصي مصغّر فقط). قرار إداري صفري التكلفة، أثره من أول دورة قبول.</li>
+    <li><b>يوم اختبار مشترك:</b> توحيد الجزء العام من اختبارات القبول (ثقافة سينمائية، مقابلة) بين الأقسام الثمانية بحيث تصبح إعادة التوجيه إجرائياً ممكنة في نفس اليوم.</li>
+    <li><b>منح موازي مستهدفة:</b> تخصيص نسبة من فائض إيراد مظاريف الإخراج والتصوير لتمويل خصم 25–50% من مصروفات الموازي بالأقسام الثلاثة لأول دفعتين — تُسترد التكلفة من ملء المقاعد الشاغرة نفسها.</li>
+    <li><b>شراكات صناعة راعية:</b> اتفاقات مع استوديوهات الدوبلاج والبوست برودكشن وشركات الأنيميشن (وسوق الخليج عبر JEEM وأمثالها) لرعاية طلاب مقابل أولوية توظيف — تحوّل القسم من "مجهول" إلى "وظيفة مضمونة".</li>
+    <li><b>مؤشر متابعة سنوي:</b> اعتماد "نسبة موازي الفرقة الأولى" مقياساً رسمياً للطلب الحقيقي على كل قسم، ومراجعته في مجلس المعهد كل نوفمبر.</li>
+  </ol>
+</div>
+<div class="tab-content card">
+  <ol class="plan">
+    <li><b>حملة "الصوت صناعة":</b> سلسلة فيديوهات قصيرة (ريلز) يظهر فيها خريجو هندسة الصوت داخل استوديوهات المكساج وحفلات ومنصات — الرسالة: كل فيلم تحبه صنع نصفه مهندس صوت. تُنتج بإمكانات المعهد نفسه كمشروعات طلابية.</li>
+    <li><b>حملة "أنيميشن مصر":</b> إبراز الطفرة الإقليمية في المحتوى المتحرك العربي وفرص العمل عن بُعد بالدولار — مع ورش ComfyUI وأدوات الإنتاج الهجين بالذكاء الاصطناعي كنقطة جذب لجيل يعيش على هذه الأدوات أصلاً.</li>
+    <li><b>أيام مفتوحة داخل المعامل:</b> دعوة طلاب الصف الثاني الثانوي (قبل عام من قرارهم) لجلسة تسجيل حقيقية، وجلسة تحريك، وجولة في ورشة المناظر — القرار يتشكل قبل التقديم بسنة لا في يومه.</li>
+    <li><b>قصص خريجين برواتب معلنة:</b> لا شيء يقنع ولي الأمر مثل رقم — لوحات مقارنة لمتوسط دخل مهندس الصوت ومصمم الأنيميشن مقابل تشبّع سوق المخرجين المساعدين.</li>
+    <li><b>حضور في نتيجة التنسيق:</b> إعلانات موجهة رقمياً في أسبوعي إعلان نتيجة الثانوية العامة تحديداً — لحظة اتخاذ القرار الفعلية.</li>
+  </ol>
+</div>
+</section>
+
+<div class="footer-note">
+  <b>حدود النموذج (بأمانة):</b> أعداد المتقدمين رسمية كاملة من 16 كشف أرقام جلوس لدورة 2025/2026 (معتمد وموازي)؛ مقاعد الموازي (20) تقديرية فعدّلها باللائحة الفعلية؛ أثر رافعة التوعية موزّع فعلياً على 2–3 دورات قبول لا دورة واحدة؛ الطالب المحوَّل من رغبته الأولى أعلى احتمالاً للتسرب ما لم تصاحبه رعاية أكاديمية بالفرقة الأولى؛ والنموذج لا يحاكي جودة المتقدمين، فامتلاء المقاعد بمتقدمين ضعاف أسوأ من شغورها. — إعداد: وحدة الذكاء الاصطناعي، أكاديمية الفنون · 8 يوليو 2026
+</div>
+</div>
+
+<script>
+// ============ البيانات الرسمية ============
+const REAL = {
+  total2324: [ // معتمد, موازي — بيان 2023/2024
+    {n:'التصوير', m:46, p:75},
+    {n:'المونتاج', m:50, p:68},
+    {n:'الإخراج', m:40, p:63},
+    {n:'الإنتاج', m:44, p:50},
+    {n:'هندسة المناظر', m:39, p:55},
+    {n:'الرسوم المتحركة', m:50, p:32},
+    {n:'السيناريو', m:38, p:35},
+    {n:'هندسة الصوت', m:38, p:34},
+  ],
+  parallelY1: [ // موازي فرقة أولى 23/24 — مؤشر الطلب الحر
+    {n:'الإخراج', v:18},{n:'التصوير', v:18},{n:'هندسة المناظر', v:17},
+    {n:'المونتاج', v:14},{n:'الإنتاج', v:8},{n:'السيناريو', v:8},
+    {n:'الرسوم المتحركة', v:7},{n:'هندسة الصوت', v:3},
+  ]
+};
+
+// ============ أقسام المحاكاة ============
+// أعداد المتقدمين: أرقام رسمية كاملة من كشوف أرقام الجلوس — دورة 2025/2026 (معتمد + موازي)
+const DEPTS = [
+  {id:'dir',  name:'الإخراج',            type:'over', appM:82, appP:45},
+  {id:'cin',  name:'التصوير',            type:'over', appM:95, appP:79},
+  {id:'mon',  name:'المونتاج',           type:'mid',  appM:49, appP:19},
+  {id:'pro',  name:'الإنتاج',            type:'mid',  appM:24, appP:11},
+  {id:'scn',  name:'السيناريو',          type:'mid',  appM:24, appP:11},
+  {id:'dec',  name:'هندسة المناظر',      type:'weak', appM:31, appP:16},
+  {id:'ani',  name:'الرسوم المتحركة',    type:'weak', appM:23, appP:2},
+  {id:'snd',  name:'هندسة الصوت',        type:'weak', appM:20, appP:10},
+];
+DEPTS.forEach(d=>{d.seatM=10; d.seatP=20;});
+
+const TYPE_LABEL = {over:['فائض','p-green'], mid:['متوازن','p-amber'], weak:['عجز','p-red']};
+
+// ============ رسم الأعمدة ============
+function bars(el, data, maxV, colorFn){
+  el.innerHTML = data.map(d=>{
+    const w = Math.max(4, (d.v/maxV)*100);
+    return `<div class="bar-row"><div class="bar-label">${d.n}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${colorFn(d)}">${d.txt??d.v}</div></div></div>`;
+  }).join('');
+}
+
+// الرسم الأول: إجمالي القيد
+bars(document.getElementById('chart-total'),
+  REAL.total2324.map(d=>({n:d.n, v:d.m+d.p, txt:(d.m+d.p)+' طالباً'})),
+  130, d=>d.v<80?'var(--red)':(d.v<100?'var(--amber)':'var(--green)'));
+
+// الرسم الثاني: موازي الفرقة الأولى
+bars(document.getElementById('chart-parallel'),
+  REAL.parallelY1.map(d=>({n:d.n, v:d.v, txt:d.v+' طلاب'})),
+  20, d=>d.v<8?'var(--red)':(d.v<14?'var(--amber)':'var(--green)'));
+
+// الرسم الثالث والرابع: المتقدمون الرسميون 2025/2026 (كشوف أرقام الجلوس)
+bars(document.getElementById('chart-app26'),
+  [{n:'التصوير',v:95},{n:'الإخراج',v:82},{n:'المونتاج',v:49},
+   {n:'هندسة المناظر',v:31},{n:'السيناريو',v:24},{n:'الإنتاج',v:24},
+   {n:'الرسوم المتحركة',v:23},{n:'هندسة الصوت',v:20}]
+   .map(d=>({...d, txt:d.v+' متقدماً'})),
+  100, d=>d.v<25?'var(--red)':(d.v<50?'var(--amber)':'var(--green)'));
+
+bars(document.getElementById('chart-app26p'),
+  [{n:'التصوير',v:79},{n:'الإخراج',v:45},{n:'المونتاج',v:19},
+   {n:'هندسة المناظر',v:16},{n:'السيناريو',v:11},{n:'الإنتاج',v:11},
+   {n:'هندسة الصوت',v:10},{n:'الرسوم المتحركة',v:2}]
+   .map(d=>({...d, txt:d.v+(d.v>10?' متقدماً':' متقدمين')})),
+  100, d=>d.v<12?'var(--red)':(d.v<30?'var(--amber)':'var(--green)'));
+
+// ============ جدول المدخلات ============
+const itbl = document.getElementById('input-table');
+DEPTS.forEach(d=>{
+  const tr = document.createElement('tr');
+  tr.className = d.type;
+  tr.innerHTML = `<td class="dept">${d.name}</td>
+    <td><input type="number" id="appm-${d.id}" value="${d.appM}" min="0"></td>
+    <td><input type="number" id="appp-${d.id}" value="${d.appP}" min="0"></td>
+    <td><input type="number" id="sm-${d.id}" value="${d.seatM}" min="0"></td>
+    <td><input type="number" id="sp-${d.id}" value="${d.seatP}" min="0"></td>
+    <td><span class="pill ${TYPE_LABEL[d.type][1]}">${TYPE_LABEL[d.type][0]}</span></td>`;
+  itbl.appendChild(tr);
+});
+
+// ============ نموذج الحساب ============
+function num(id){ return Math.max(0, +document.getElementById(id).value || 0); }
+
+// نموذج بمسارين منفصلين: المعتمد والموازي — لكل منهما فائضه وتوجيهه المستقل
+function runStream(streamKey, seatKey, L1, L2, L3, pass){
+  const rows = DEPTS.map(d=>{
+    let A = num(streamKey+'-'+d.id);
+    if(d.type==='weak'){
+      A = A * (1 + 1.2*L1/100);                      // التوعية ترفع المسارين
+      if(streamKey==='appp') A = A * (1 + 0.8*L3/100); // حوافز المصروفات ترفع الموازي فقط
+    }
+    const seats = num(seatKey+'-'+d.id);
+    const qualified = A * pass/100;
+    const intake0 = Math.min(qualified, seats);
+    return {d, seats, qualified, intake0, redirected:0};
+  });
+  const surplus = rows.filter(r=>r.d.type==='over')
+                      .reduce((s,r)=>s+Math.max(0, r.qualified-r.seats), 0);
+  const pool = surplus * L2/100;
+  const weak = rows.filter(r=>r.d.type==='weak' && r.seats>r.intake0);
+  const gapSum = weak.reduce((s,r)=>s+(r.seats-r.intake0),0);
+  if(gapSum>0 && pool>0){
+    weak.forEach(r=>{
+      r.redirected = Math.min(pool*(r.seats-r.intake0)/gapSum, r.seats-r.intake0);
+    });
+  }
+  rows.forEach(r=>{
+    r.intake = Math.min(r.seats, r.intake0 + r.redirected);
+  });
+  return rows;
+}
+
+function simulate(L1, L2, L3, pass){
+  const M = runStream('appm','sm', L1, L2, L3, pass);
+  const P = runStream('appp','sp', L1, L2, L3, pass);
+  const rows = DEPTS.map((d,i)=>{
+    const seats = M[i].seats + P[i].seats;
+    const qualified = M[i].qualified + P[i].qualified;
+    const redirected = M[i].redirected + P[i].redirected;
+    const intake = M[i].intake + P[i].intake;
+    return {d, seats, qualified, redirected, intake,
+            intakeM:M[i].intake, intakeP:P[i].intake,
+            seatsM:M[i].seats, seatsP:P[i].seats,
+            fill: seats>0 ? intake/seats : 0};
+  });
+  const totalSeats = rows.reduce((s,r)=>s+r.seats,0);
+  const totalIntake = rows.reduce((s,r)=>s+r.intake,0);
+  const placed = rows.reduce((s,r)=>s+r.redirected,0);
+  const lost = rows.reduce((s,r)=>s+Math.max(0,r.qualified-r.intake),0) - placed;
+  return {rows, empty: totalSeats-totalIntake, intake: totalIntake, lost: Math.max(0,lost)};
+}
+
+function update(){
+  const L1=+document.getElementById('l1').value,
+        L2=+document.getElementById('l2').value,
+        L3=+document.getElementById('l3').value,
+        pass=+document.getElementById('l-pass').value;
+  document.getElementById('v-l1').textContent = L1+'%';
+  document.getElementById('v-l2').textContent = L2+'%';
+  document.getElementById('v-l3').textContent = L3+'%';
+  document.getElementById('v-pass').textContent = pass+'%';
+
+  const base = simulate(0,0,0,pass);
+  const now  = simulate(L1,L2,L3,pass);
+
+  document.getElementById('k-empty').textContent  = Math.round(now.empty);
+  document.getElementById('k-empty0').textContent = Math.round(base.empty);
+  document.getElementById('k-intake').textContent = Math.round(now.intake);
+  document.getElementById('k-lost').textContent   = Math.round(now.lost);
+
+  // أعمدة الامتلاء قبل/بعد
+  const chart = document.getElementById('chart-result');
+  chart.innerHTML = now.rows.map((r,i)=>{
+    const b = base.rows[i];
+    const col = r.fill>=0.9?'var(--green)':(r.fill>=0.6?'var(--amber)':'var(--red)');
+    const colB = b.fill>=0.9?'#3a5c4a':(b.fill>=0.6?'#5c4f36':'#5c3636');
+    return `<div class="bar-row"><div class="bar-label">${r.d.name}</div>
+      <div class="bar-track" style="height:13px;margin-bottom:2px"><div class="bar-fill" style="width:${Math.max(3,b.fill*100)}%;background:${colB};font-size:10px;color:#cfd3dc">قبل ${Math.round(b.fill*100)}%</div></div></div>
+      <div class="bar-row" style="margin-top:-4px"><div class="bar-label"></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3,r.fill*100)}%;background:${col}">بعد ${Math.round(r.fill*100)}%</div></div></div>`;
+  }).join('');
+
+  // جدول النتائج
+  const rtbl = document.getElementById('result-table');
+  rtbl.querySelectorAll('tr:not(:first-child)').forEach(tr=>tr.remove());
+  now.rows.forEach(r=>{
+    const verdict = r.fill>=0.9?['ممتلئ','p-green']:(r.fill>=0.6?['مقبول','p-amber']:['أزمة','p-red']);
+    const tr = document.createElement('tr');
+    tr.className = r.d.type;
+    tr.innerHTML = `<td class="dept">${r.d.name}</td>
+      <td>${Math.round(r.qualified)}</td>
+      <td>${Math.round(r.redirected)}</td>
+      <td>${Math.round(r.intakeM)} / ${r.seatsM}</td>
+      <td>${Math.round(r.intakeP)} / ${r.seatsP}</td>
+      <td>${Math.round(r.fill*100)}%</td>
+      <td><span class="pill ${verdict[1]}">${verdict[0]}</span></td>`;
+    rtbl.appendChild(tr);
+  });
+}
+
+['l1','l2','l3','l-pass'].forEach(id=>document.getElementById(id).addEventListener('input', update));
+document.querySelectorAll('#input-table input').forEach(el=>el.addEventListener('input', update));
+
+function showTab(i, btn){
+  document.querySelectorAll('.tab-content').forEach((el,j)=>el.classList.toggle('active', i===j));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b===btn));
+}
+
+update();
+</script>
+</body>
+</html>

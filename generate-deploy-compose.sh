@@ -8,6 +8,7 @@ b64() { base64 < "$1" | tr -d '\n'; }
 B64_INDEX="$(b64 "$DIR/index.html")"
 B64_DASH="$(b64 "$DIR/dashboard.html")"
 B64_PRES="$(b64 "$DIR/presentation.html")"
+B64_BAL="$(b64 "$DIR/balance-simulation.html")"
 B64_JSON="$(b64 "$DIR/data/projects.json")"
 B64_XLSX="$(b64 "$DIR/data/tracker-cleaned.xlsx")"
 
@@ -34,6 +35,7 @@ services:
         echo "$B64_INDEX" | base64 -d > /usr/share/nginx/html/index.html
         echo "$B64_DASH" | base64 -d > /usr/share/nginx/html/dashboard.html
         echo "$B64_PRES" | base64 -d > /usr/share/nginx/html/presentation.html
+        echo "$B64_BAL" | base64 -d > /usr/share/nginx/html/balance-simulation.html
         echo "$B64_JSON" | base64 -d > /usr/share/nginx/html/data/projects.json
         echo "$B64_XLSX" | base64 -d > /usr/share/nginx/html/data/tracker-cleaned.xlsx
         exec nginx -g 'daemon off;'

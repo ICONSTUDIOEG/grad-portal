@@ -16,6 +16,7 @@ services:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./dashboard.html:/usr/share/nginx/html/dashboard.html:ro
       - ./presentation.html:/usr/share/nginx/html/presentation.html:ro
+      - ./balance-simulation.html:/usr/share/nginx/html/balance-simulation.html:ro
       - ./data:/usr/share/nginx/html/data:ro
 
 networks:

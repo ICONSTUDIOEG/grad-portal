@@ -27,7 +27,7 @@ if [[ ! -d .git ]]; then
   git init -b "${GITHUB_BRANCH}"
 fi
 
-git add .gitignore README.md index.html dashboard.html presentation.html deploy.config.sh deploy-mini.sh deploy-direct.sh \
+git add .gitignore README.md index.html dashboard.html presentation.html balance-simulation.html deploy.config.sh deploy-mini.sh deploy-direct.sh \
   generate-deploy-compose.sh redeploy.sh Dockerfile docker-compose.yml docker-compose.configs.example.yml \
   docker-compose.remote-html.yml deploy-local.sh scripts/ data/ n8n/
 

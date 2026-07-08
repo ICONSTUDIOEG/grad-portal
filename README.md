@@ -14,7 +14,7 @@ Deploy or redeploy from this folder:
 ./deploy-mini.sh
 ```
 
-**Live:** https://grad.iconstudio.tech · **Dashboard:** `/dashboard.html` · **Presentation:** `/presentation.html`
+**Live:** https://grad.iconstudio.tech · **Dashboard:** `/dashboard.html` · **Presentation:** `/presentation.html` · **Balance simulation:** `/balance-simulation.html`
 
 GitHub raw base (default): `https://raw.githubusercontent.com/ICONSTUDIOEG/grad-portal/main`
 
