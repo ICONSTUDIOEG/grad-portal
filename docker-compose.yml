@@ -15,6 +15,7 @@ services:
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
       - ./dashboard.html:/usr/share/nginx/html/dashboard.html:ro
+      - ./presentation.html:/usr/share/nginx/html/presentation.html:ro
       - ./data:/usr/share/nginx/html/data:ro
 
 networks:

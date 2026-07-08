@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مبادرة اصنع الفيلم من الداخل - عرض تقديمي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 1. THE SETUP & RTL CONSIDERATIONS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #050505; /* Pure black for presentation mode */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* Hide scrollbars */
+            font-family: 'Tajawal', sans-serif;
+            color: #ffffff;
+        }
+
+        /* Presentation Wrapper for scaling */
+        #presentation-wrapper {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            transform-origin: center center;
+        }
+
+        .slide-container {
+            align-items: center;
+            background-color: #0d0d0d;
+            background-image: radial-gradient(circle at 10% 20%, rgba(45, 30, 10, 0.4) 0%, transparent 50%),
+                              radial-gradient(circle at 90% 80%, rgba(60, 40, 15, 0.4) 0%, transparent 50%);
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding: 50px 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .slide-container.active {
+            display: flex; /* Show active slide */
+            opacity: 1;
+            animation: slideIn 0.5s forwards;
+            z-index: 10;
+        }
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            bottom: 30px;
+            left: 5%;
+            right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #F5A623, transparent);
+            opacity: 0.5;
+        }
+
+        /* 2. CONSISTENT TYPOGRAPHY */
+        .slide-container h1,
+        .slide-container h2,
+        .slide-container h3 {
+            font-family: 'Cairo', sans-serif;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .slide-container h1 span,
+        .slide-container h2 span,
+        .slide-container h3 span,
+        .highlight-text {
+            color: #F5A623; /* Cinematic Gold */
+        }
+
+        .slide-container h1 {
+            font-size: 75px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .slide-container .slide-title {
+            font-size: 50px;
+            font-weight: 700;
+            width: 100%;
+            text-align: right;
+            margin-bottom: 40px;
+        }
+
+        .slide-container h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .slide-container p,
+        .slide-container li,
+        .slide-container .subtitle {
+            font-family: 'Tajawal', sans-serif;
+            color: #cccccc;
+            font-size: 22px;
+            line-height: 1.6;
+        }
+
+        .slide-container .subtitle {
+            font-size: 26px;
+            font-weight: 500;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* 3. LAYOUTS */
+        .title-layout {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .highlight-numbers-layout {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            width: 100%;
+        }
+        
+        .highlight-numbers-layout > div:first-child {
+            flex: 0 0 45%;
+            text-align: center;
+            background: rgba(245, 166, 35, 0.05);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(245, 166, 35, 0.2);
+        }
+
+        .highlight-numbers-layout .number {
+            color: #F5A623;
+            font-size: 160px;
+            font-weight: 800;
+            font-family: 'Cairo', sans-serif;
+            line-height: 1;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .highlight-numbers-layout .number-label {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+
+        .tiled-content {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        .tile {
+            background-color: rgba(26, 26, 26, 0.8);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 40px 30px;
+            flex: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tile .icon {
+            background: rgba(245, 166, 35, 0.1);
+            color: #F5A623;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            margin-bottom: 25px;
+        }
+
+        .tile p { font-size: 20px; }
+
+        .section-title-layout {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .section-title-layout h2 {
+            font-size: 70px;
+            margin-bottom: 20px;
+        }
+
+        .section-title-layout hr {
+            background-color: #F5A623;
+            border: none;
+            height: 4px;
+            width: 120px;
+            margin: 30px auto;
+        }
+
+        .two-column {
+            display: flex;
+            gap: 50px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .two-column > div { flex: 1; }
+
+        .bullet-list ul { list-style: none; }
+
+        .bullet-list li {
+            position: relative;
+            padding-right: 40px;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .bullet-list li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 0;
+            top: 5px;
+            color: #F5A623;
+            font-size: 20px;
+        }
+
+        .image-wrapper {
+            border-radius: 16px;
+            overflow: hidden;
+            height: 400px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            background-color: #222;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .two-column.tiled { align-items: stretch; }
+
+        .two-column.tiled > div {
+            background-color: rgba(26, 26, 26, 0.8);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .two-column.tiled h3 {
+            color: #F5A623;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .image-tile {
+            flex: 1;
+            text-align: right;
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+
+        .image-tile .image-wrapper {
+            height: 200px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: none;
+            box-shadow: none;
+        }
+
+        .image-tile h3 { font-size: 24px; margin-bottom: 10px; }
+        .image-tile p { font-size: 18px; }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .bar .label {
+            flex: 0 0 250px;
+            font-weight: 700;
+            font-size: 22px;
+            text-align: left;
+            color: #ffffff;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .bar .bar-inner {
+            background-color: #333;
+            border-radius: 8px;
+            flex-grow: 1;
+            height: 50px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d48b1c, #F5A623);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-left: 20px;
+            color: #000;
+            font-weight: 800;
+            font-size: 20px;
+            width: 0; /* Animated via JS/CSS */
+            transition: width 1.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        /* 4. NAVIGATION CONTROLS */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(20, 20, 20, 0.85);
+            padding: 10px 25px;
+            border-radius: 40px;
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .controls button {
+            background: transparent;
+            color: #F5A623;
+            border: 2px solid #F5A623;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .controls button:hover {
+            background: #F5A623;
+            color: #000;
+            transform: scale(1.1);
+        }
+
+        .counter {
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            color: #fff;
+            min-width: 60px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="presentation-wrapper">
+        <!-- Slide 1: Title_Slide -->
+        <div class="slide-container active">
+            <div class="title-layout">
+                <h1>مبادرة: <span>اصنع الفيلم من الداخل</span></h1>
+                <p class="subtitle">خطة استراتيجية وقيادية لمعالجة انخفاض الإقبال على برنامجي<br>هندسة الصوت والرسوم المتحركة بالمعهد العالي للسينما</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Highlighted_Numbers (The Problem Data) -->
+        <div class="slide-container">
+            <h2 class="slide-title">حجم <span>التحدي</span> (إحصائيات ٢٠٢٤ - ٢٠٢٥)</h2>
+            <div class="content-area">
+                <div class="highlight-numbers-layout">
+                    <div>
+                        <div class="number">5</div>
+                        <div class="number-label">طلاب فقط في الفرقة الأولى (رسوم متحركة)</div>
+                    </div>
+                    <div>
+                        <h3>أرقام تدق ناقوس الخطر</h3>
+                        <p>تعكس إحصائيات القبول تحدياً حقيقياً يهدد هذه البرامج الحيوية. لا يتجاوز عدد طلاب الفرقة الأولى بالرسوم المتحركة ٥ طلاب، بينما يبلغ عدد طلاب هندسة الصوت ٩ طلاب فقط.</p>
+                        <br>
+                        <p>يحدث هذا التراجع رغم الطفرة العالمية والمحلية في مجالات <strong>صناعة المحتوى الرقمي، الألعاب الإلكترونية، والإنتاج السينمائي</strong>، مما يؤكد أن المشكلة تسويقية في المقام الأول.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Tiled_Text_With_Icons (Root Causes) -->
+        <div class="slide-container">
+            <h2 class="slide-title">التشخيص الدقيق: <span>جذور المشكلة</span></h2>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-eye-slash"></i></div>
+                        <h3>ضعف الوعي</h3>
+                        <p>لا يمتلك طلاب الثانوية معلومات كافية حول طبيعة المناهج الدراسية، والمهارات التقنية المكتسبة، أو حتى شكل البيئة التعليمية داخل هذه الأقسام.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-image"></i></div>
+                        <h3>الصورة الذهنية</h3>
+                        <p>اعتقاد خاطئ وشائع بأن فرص العمل محدودة وتقتصر على التخصصات الكلاسيكية (كالإخراج)، متجاهلين تنامي الطلب على محرري الصوت ومصممي التحريك.</p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-bullhorn"></i></div>
+                        <h3>القصور التسويقي</h3>
+                        <p>غياب حملات التوعية الاستباقية في المدارس، وضعف إبراز النماذج الناجحة من الخريجين وقصص نجاحهم المهنية المتميزة في سوق العمل المباشر.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Section_Title (The Strategy) -->
+        <div class="slide-container">
+            <div class="section-title-layout">
+                <h2>التحول الاستراتيجي</h2>
+                <hr>
+                <p class="subtitle">الانتقال من "التسويق الإعلاني الجاف" إلى <span>"التسويق بالتجربة الحية"</span> لاستهداف الأجيال الجديدة.</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Image_Right_Text_Left (The Initiative) -->
+        <div class="slide-container">
+            <h2 class="slide-title">جوهر المبادرة: <span>اصنع الفيلم من الداخل</span></h2>
+            <div class="content-area">
+                <div class="two-column">
+                    <div class="bullet-list">
+                        <ul>
+                            <li><strong>جولات ميدانية مكثفة:</strong> استقبال طلاب الثانوية لاكتشاف استوديوهات الصوت الاحترافية ومعامل الرسوم المتحركة المتطورة.</li>
+                            <li><strong>التجربة العملية التفاعلية:</strong> منح الطالب فرصة تجربة هندسة مكس صوتي أو تحريك شخصية كرتونية بنفسه داخل المعامل.</li>
+                            <li><strong>الإنتاج الفوري:</strong> إشراك الطلاب في إنتاج مشروع فيلم قصير كجزء من تجربة الزيارة لترسيخ الأثر الإيجابي.</li>
+                            <li><strong>لقاءات ملهمة:</strong> استضافة خريجين بارزين يعملون بكبرى شركات الإنتاج لسرد مسيرتهم المهنية وفرص السوق.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80" alt="Professional sound mixing studio setup">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Two_Column_Tiled_Text (Why this initiative) -->
+        <div class="slide-container">
+            <h2 class="slide-title">لماذا هذه <span>المبادرة بالتحديد؟</span></h2>
+            <div class="content-area">
+                <div class="two-column tiled">
+                    <div>
+                        <h3>تصحيح المفاهيم وتغيير الصورة</h3>
+                        <p>الجيل الحالي (Gen Z) لا يتأثر بالخطابات النظرية. عندما يعيش الطالب تجربة "صناعة الفيلم" بنفسه، يدرك فوراً أن العمل السينمائي ليس مجرد كاميرا وممثل، بل هو منظومة متكاملة يمثل فيها <strong>"الصوت"</strong> و <strong>"التحريك"</strong> أعمدة أساسية تصنع الفارق في جودة العمل.</p>
+                    </div>
+                    <div>
+                        <h3>خلق الولاء والانتماء المسبق</h3>
+                        <p>التجربة العملية تبني ارتباطاً عاطفياً وثقة عالية لدى الطالب قبل مرحلة التنسيق. تحوله هذه التجربة من مجرد "باحث عن مقعد جامعي" إلى "شغوف" يتخذ قراره الأكاديمي بناءً على اكتشاف حقيقي لميوله وقدراته الفنية.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Tiled_Images (Implementation Strategy) -->
+        <div class="slide-container">
+            <h2 class="slide-title">آليات <span>التنفيذ والتوسع</span></h2>
+            <div class="content-area">
+                <div class="tiled-content">
+                    <div class="image-tile">
+                        <div class="image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1551269901-5c5e14c25df7?auto=format&fit=crop&w=600&q=80" alt="Digital animation editing workspace">
+                        </div>
+                        <h3>١. التواجد الرقمي</h3>
+                        <p>تفعيل حملات عبر السوشيال ميديا لعرض مشاريع الطلاب وتوجيه رسائل مخصصة لمحبي الرسم وعشاق التكنولوجيا.</p>
+                    </div>
+                    <div class="image-tile">
+                        <div class="image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80" alt="Students in a classroom/workshop setting">
+                        </div>
+                        <h3>٢. الأيام المفتوحة</h3>
+                        <p>استهداف ١٠٠-٢٠٠ طالب مهتم بالفنون لتنفيذ مبادرة "اصنع الفيلم" بتركيز عالٍ لضمان جودة التجربة.</p>
+                    </div>
+                    <div class="image-tile">
+                        <div class="image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=600&q=80" alt="Industry partnership handshake">
+                        </div>
+                        <h3>٣. شراكات الصناعة</h3>
+                        <p>توقيع بروتوكولات تعاون مع استوديوهات الإنتاج لضمان تدريب ميداني للطلاب وتوفير فرص العمل.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Bar_Chart_For_Comparisons (KPIs) -->
+        <div class="slide-container" id="chart-slide">
+            <h2 class="slide-title">مؤشرات <span>النجاح والقياس (KPIs)</span></h2>
+            <div class="content-area">
+                <div class="chart-container">
+                    <div class="bar">
+                        <div class="label">زيادة المتقدمين للأقسام</div>
+                        <div class="bar-inner">
+                            <div class="bar-fill" data-width="40%">الهدف: +٤٠٪</div>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div class="label">تفاعل الحملة الرقمية</div>
+                        <div class="bar-inner">
+                            <div class="bar-fill" data-width="85%">الهدف: ٢٠٠ ألف مشاهدة</div>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div class="label">زيادة طلبات الاستفسار</div>
+                        <div class="bar-inner">
+                            <div class="bar-fill" data-width="50%">الهدف: +٥٠٪</div>
+                        </div>
+                    </div>
+                    <div class="bar">
+                        <div class="label">تقليص الفجوة مع الأقسام</div>
+                        <div class="bar-inner">
+                            <div class="bar-fill" data-width="80%">الهدف: فجوة أقل من ٢٠٪</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 40px; font-weight: 500;">
+                    إلى جانب المؤشرات النوعية: <span class="highlight-text">تحسين الصورة الذهنية، رفع معدلات الرضا، وتوسيع الشراكات.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls">
+        <button onclick="prevSlide()" title="السابق (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="counter" id="slide-counter">1 / 8</div>
+        <button onclick="nextSlide()" title="التالي (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide-container');
+        const counter = document.getElementById('slide-counter');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                    
+                    if (slide.id === 'chart-slide') {
+                        setTimeout(() => {
+                            const bars = slide.querySelectorAll('.bar-fill');
+                            bars.forEach(bar => {
+                                bar.style.width = bar.getAttribute('data-width');
+                            });
+                        }, 100);
+                    }
+                }
+            });
+            counter.innerText = `${index + 1} / ${slides.length}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') nextSlide();
+            if (e.key === 'ArrowRight') prevSlide();
+        });
+
+        function resizePresentation() {
+            const wrapper = document.getElementById('presentation-wrapper');
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            const scaleX = windowWidth / 1280;
+            const scaleY = windowHeight / 720;
+            const scale = Math.min(scaleX, scaleY) * 0.95;
+            
+            wrapper.style.transform = `scale(${scale})`;
+        }
+
+        window.addEventListener('resize', resizePresentation);
+        
+        resizePresentation();
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
