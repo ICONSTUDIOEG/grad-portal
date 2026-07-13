@@ -89,6 +89,7 @@
       <div class="l">يوم حتى التحكيم 8/7</div>
     </div>
   </div>
+  <div class="stats" id="formatStatCards" style="margin-top:10px"></div>
   <div class="stats" id="statCards"></div>
 </header>
 
@@ -439,6 +440,13 @@ function renderMasterReport(){
   const el = $("#masterReport");
   if(!el) return;
   const fmt = countMasterFormats();
+  const top = $("#formatStatCards");
+  if(top){
+    top.innerHTML = `
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--cyan)">${fmt.stereo}</div><div class="l">استيريو</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--purple)">${fmt.atmos}</div><div class="l">Atmos</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--gold)">${fmt.fiveOne}</div><div class="l">5.1</div></div>`;
+  }
   const kpis = $("#masterFormatKpis");
   if(kpis){
     kpis.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">

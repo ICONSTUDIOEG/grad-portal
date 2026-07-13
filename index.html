@@ -122,6 +122,15 @@
       </div>
       <p class="note">مسار الاعتماد الإجباري: تصوير ← مونتاج ← الفولي ← مراجعة استيريو ← المكساج النهائي (دولبي) ← DCP ← جاهز للتحكيم. لا يُسمح بتخطي مرحلة.</p>
     </div>
+    <div class="card" id="formatCard">
+      <h3>🎚️ توزيع صيغ الـ Master</h3>
+      <div class="hstats" style="margin:10px 0 12px">
+        <div class="stat s-stereo"><b id="fmtStereo">0</b>استيريو</div>
+        <div class="stat s-atmos"><b id="fmtAtmos">0</b>Atmos</div>
+        <div class="stat s-51"><b id="fmt51">0</b>5.1</div>
+      </div>
+      <div id="formatLists" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-size:.82rem"></div>
+    </div>
     <div class="card" id="staffContacts">
       <h3>📞 تواصل فريق اللجنة</h3>
       <p class="note" id="contactsSubtitle" style="margin-top:0;margin-bottom:12px"></p>
@@ -310,7 +319,14 @@ function applyRemoteState(remote){
   if(remote?.projects?.length) DATA.projects = remote.projects;
   DATA.bookings = Array.isArray(remote?.bookings) ? remote.bookings : [];
   DATA.professors = remote?.professors?.length ? remote.professors : PROFESSORS;
-  if(remote?.meta) DATA.meta = {...DEFAULT_META, ...remote.meta};
+  if(remote?.meta){
+    DATA.meta = {
+      ...DEFAULT_META,
+      ...remote.meta,
+      externalReady: remote.meta.externalReady || DEFAULT_META.externalReady,
+      externalFormats: remote.meta.externalFormats || DEFAULT_META.externalFormats
+    };
+  }
 }
 
 async function loadState(){
@@ -472,21 +488,52 @@ function normalizeMasterFormat(raw){
   return null;
 }
 
-function countMasterFormats(){
-  const counts = {stereo:0, atmos:0, fiveOne:0};
-  const bump = (fmt)=>{
+function masterFormatEntries(){
+  const seen = new Set();
+  const out = {stereo:[], atmos:[], fiveOne:[]};
+  const add = (name, fmt, extra="")=>{
     const n = normalizeMasterFormat(fmt);
-    if(n==="Atmos") counts.atmos++;
-    else if(n==="5.1") counts.fiveOne++;
-    else if(n==="استيريو") counts.stereo++;
+    if(!n || !name) return;
+    const key = n+"|"+name;
+    if(seen.has(key)) return;
+    seen.add(key);
+    const label = extra ? `${name} (${extra})` : name;
+    if(n==="Atmos") out.atmos.push(label);
+    else if(n==="5.1") out.fiveOne.push(label);
+    else if(n==="استيريو") out.stereo.push(label);
   };
-  DATA.projects.forEach(p=> bump(p.master || p.masterFormat));
-  (DATA.meta?.externalReady || []).forEach(x=> bump(x.format));
-  (DATA.meta?.externalFormats || []).forEach(x=>{
-    const already = (DATA.meta?.externalReady || []).some(e=>e.name===x.name);
-    if(!already) bump(x.format);
-  });
-  return counts;
+  DATA.projects.forEach(p=> add(p.t, p.master || p.masterFormat));
+  (DATA.meta?.externalReady || []).forEach(x=> add(x.name, x.format, "خارج الـ22"));
+  (DATA.meta?.externalFormats || []).forEach(x=> add(x.name, x.format, "خارج الـ22"));
+  return out;
+}
+
+function countMasterFormats(){
+  const e = masterFormatEntries();
+  return {stereo:e.stereo.length, atmos:e.atmos.length, fiveOne:e.fiveOne.length};
+}
+
+function renderFormatBreakdown(){
+  const e = masterFormatEntries();
+  const fmt = {stereo:e.stereo.length, atmos:e.atmos.length, fiveOne:e.fiveOne.length};
+  $("#stStereo").textContent = fmt.stereo;
+  $("#stAtmos").textContent = fmt.atmos;
+  $("#st51").textContent = fmt.fiveOne;
+  const fs = $("#fmtStereo"), fa = $("#fmtAtmos"), f51 = $("#fmt51");
+  if(fs) fs.textContent = fmt.stereo;
+  if(fa) fa.textContent = fmt.atmos;
+  if(f51) f51.textContent = fmt.fiveOne;
+  const lists = $("#formatLists");
+  if(!lists) return;
+  const block = (title, items, color)=>`
+    <div style="background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:12px">
+      <div style="color:${color};font-weight:700;margin-bottom:8px">${title} — ${items.length}</div>
+      ${items.length ? `<ul style="margin:0;padding-right:18px;line-height:1.8;color:var(--mut)">${items.map(n=>`<li>${n}</li>`).join("")}</ul>` : `<span style="color:var(--mut)">لا يوجد بعد</span>`}
+    </div>`;
+  lists.innerHTML =
+    block("استيريو", e.stereo, "var(--cyan)") +
+    block("Atmos", e.atmos, "var(--purple)") +
+    block("5.1", e.fiveOne, "var(--gold)");
 }
 
 function renderStats(){
@@ -494,10 +541,7 @@ function renderStats(){
   $("#stActive").textContent = DATA.projects.filter(p=>p.shot && p.idx>0 && p.idx<6).length;
   $("#stShoot").textContent = DATA.projects.filter(p=>!p.shot).length;
   $("#days").textContent = Math.max(0, Math.ceil((new Date(CONFIG.JURY_DATE)-new Date())/864e5));
-  const fmt = countMasterFormats();
-  $("#stStereo").textContent = fmt.stereo;
-  $("#stAtmos").textContent = fmt.atmos;
-  $("#st51").textContent = fmt.fiveOne;
+  renderFormatBreakdown();
   const rc = $("#cReadyCount");
   if(rc && DATA.meta?.readyForJury != null) rc.value = DATA.meta.readyForJury;
 }
