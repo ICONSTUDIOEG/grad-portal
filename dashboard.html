@@ -187,7 +187,7 @@ const STATUS_CLASS = {
 
 const STAT_CONFIG = [
   {key:"all", label:"إجمالي المشاريع", cls:"", filter:()=>true},
-  {key:"ready", label:"جاهز للتحكيم", cls:"s-ready", filter:p=>p.readiness.includes("جاهز")},
+  {key:"ready", label:"جاهز للتحكيم", cls:"s-ready", filter:p=>!!p.readiness?.includes("جاهز")},
   {key:"finish", label:"قيد التشطيب", cls:"s-finish", filter:p=>p.readiness==="قيد التشطيب"},
   {key:"mix", label:"بانتظار المكساج", cls:"s-mix", filter:p=>p.readiness==="بانتظار المكساج"},
   {key:"shoot", label:"تصوير غير مكتمل", cls:"s-shoot", filter:p=>!p.shootingDone},
@@ -300,8 +300,9 @@ function renderStatCards(){
 }
 
 function renderCharts(){
-  const labels = Object.keys(DATA.summary);
-  const values = Object.values(DATA.summary);
+  const summary = DATA.summary || {};
+  const labels = Object.keys(summary);
+  const values = Object.values(summary);
   const colors = labels.map(l=>{
     if(l.includes("جاهز")) return "#3ec97e";
     if(l.includes("قيد")) return "#e8b339";
@@ -319,8 +320,9 @@ function renderCharts(){
     }
   });
 
-  const max = Math.max(...DATA.soundReport.workload.map(w=>w[1]), 1);
-  $("#workloadBars").innerHTML = DATA.soundReport.workload.map(([name,cnt])=>`
+  const workload = DATA.soundReport?.workload || [];
+  const max = Math.max(...workload.map(w=>w[1]), 1);
+  $("#workloadBars").innerHTML = workload.map(([name,cnt])=>`
     <div class="bar-row">
       <span class="lbl">${name}</span>
       <div class="track"><i style="width:${cnt/max*100}%"></i></div>
@@ -330,19 +332,32 @@ function renderCharts(){
 
 function renderAlerts(){
   const items = [];
-  if(DATA.meta.dcpPolicy){
-    items.push(`<div class="alert-item" style="border-color:var(--warn);background:rgba(232,179,57,.1)"><b>قرار اللجنة — DCP:</b> ${DATA.meta.dcpPolicy}</div>`);
+  const m = DATA.meta || {};
+  const daysLeft = daysUntilJury(m.juryDate);
+  if(m.dcpPolicy){
+    items.push(`<div class="alert-item" style="border-color:var(--warn);background:rgba(232,179,57,.1)"><b>قرار اللجنة — DCP:</b> ${m.dcpPolicy}</div>`);
   }
-  if(DATA.meta.juryPostponed){
-    items.push(`<div class="alert-item" style="border-color:var(--cyan);background:rgba(63,193,201,.08)"><b>موعد التحكيم:</b> ${DATA.meta.juryPostponed}</div>`);
+  if(m.juryDate){
+    if(daysLeft > 0){
+      items.push(`<div class="alert-item" style="border-color:var(--cyan);background:rgba(63,193,201,.08)"><b>موعد التحكيم:</b> ${m.juryDateDisplay || m.juryDate} — متبقّي ${daysLeft} يومًا</div>`);
+    }else{
+      items.push(`<div class="alert-item" style="border-color:var(--ok);background:rgba(62,201,126,.08)"><b>موعد التحكيم:</b> ${m.juryDateDisplay || m.juryDate} — حان الموعد / بدأ تنفيذ قرار الـ DCP</div>`);
+    }
   }
-  const sr = DATA.soundReport;
+  const sr = DATA.soundReport || {};
   if(sr.no_engineer) items.push(`<div class="alert-item"><b>${sr.no_engineer} مشروع</b> جاهز للمكساج بلا مهندس صوت مُسند — يجب الإسناد فورًا.</div>`);
   if(sr.shooting_incomplete) items.push(`<div class="alert-item"><b>${sr.shooting_incomplete} مشروع</b> لم يكتمل تصويره — لا يمكن بدء المكساج.</div>`);
   const mixPending = DATA.projects.filter(p=>p.shootingDone && !p.mixDone).length;
-  if(mixPending) items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> بانتظار المكساج والتحكيم بعد ${daysUntilJury(DATA.meta.juryDate)} يومًا فقط.</div>`);
-  const heavy = DATA.soundReport.workload.filter(w=>w[1]>=2);
-  heavy.forEach(([n,c])=> items.push(`<div class="alert-item">مهندس الصوت <b>${n}</b> محمّل بـ ${c} مشروعات — يُراعى عند الجدولة.</div>`));
+  if(mixPending){
+    if(daysLeft > 0){
+      items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> بانتظار المكساج — متبقّي ${daysLeft} يومًا حتى التحكيم.</div>`);
+    }else{
+      items.push(`<div class="alert-item"><b>${mixPending} مشروع</b> لم يكتمل مكساجها بعد — يُخرَج DCP حسب قرار اللجنة.</div>`);
+    }
+  }
+  (sr.workload || []).filter(w=>w[1]>=2).forEach(([n,c])=>{
+    items.push(`<div class="alert-item">مهندس الصوت <b>${n}</b> محمّل بـ ${c} مشروعات — يُراعى عند الجدولة.</div>`);
+  });
   $("#alerts").innerHTML = items.join("") || '<p class="meta-foot">لا توجد تنبيهات حرجة حاليًا ✅</p>';
 }
 
@@ -383,8 +398,9 @@ function applyFilters(){
   const statFn = (STAT_CONFIG.find(s=>s.key===activeStat)||STAT_CONFIG[0]).filter;
 
   let visible = 0;
-  $("#projTable tbody tr").forEach(tr=>{
+  document.querySelectorAll("#projTable tbody tr").forEach(tr=>{
     const p = DATA.projects.find(x=>x.id===+tr.dataset.id);
+    if(!p) return;
     let show = statFn(p);
     if(q && !`${p.name} ${p.director} ${p.sound}`.toLowerCase().includes(q)) show=false;
     if(st && p.readiness!==st) show=false;
