@@ -153,6 +153,7 @@
       <h3>مكساج مكتمل</h3>
       <div id="mixDone"></div>
       <h3>Master Files</h3>
+      <div id="masterFormatKpis" style="margin-bottom:12px"></div>
       <div id="masterReport"></div>
     </div>
     <div class="card">
@@ -405,9 +406,47 @@ function renderSoundReport(){
   $("#mixDone").innerHTML = sr.mix_done_projects.map(n=>chip(n,"c-ok")).join(" ") || "—";
 }
 
+function normalizeMasterFormat(raw){
+  const s = String(raw || "").trim().toLowerCase().replace(/\s+/g,"");
+  if(!s) return null;
+  if(s.includes("atmos")) return "Atmos";
+  if(s.includes("5.1") || s.includes("5,1") || s==="51") return "5.1";
+  if(s.includes("stereo") || s.includes("استيريو") || s.includes("ستيريو") || s.includes("استريو")) return "استيريو";
+  return null;
+}
+
+function countMasterFormats(){
+  const counts = {stereo:0, atmos:0, fiveOne:0};
+  const bump = (fmt)=>{
+    const n = normalizeMasterFormat(fmt);
+    if(n==="Atmos") counts.atmos++;
+    else if(n==="5.1") counts.fiveOne++;
+    else if(n==="استيريو") counts.stereo++;
+  };
+  (DATA.projects||[]).forEach(p=>{
+    if(p.masterDone || p.masterFormat || p.master) bump(p.masterFormat || p.master);
+  });
+  (DATA.meta?.externalReady||[]).forEach(x=> bump(x.format));
+  (DATA.masterReport?.external||[]).forEach(x=>{
+    // avoid double-count if already in externalReady
+    const already = (DATA.meta?.externalReady||[]).some(e=>e.name===x.name);
+    if(!already) bump(x.format);
+  });
+  return counts;
+}
+
 function renderMasterReport(){
   const el = $("#masterReport");
   if(!el) return;
+  const fmt = countMasterFormats();
+  const kpis = $("#masterFormatKpis");
+  if(kpis){
+    kpis.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--cyan)">${fmt.stereo}</div><div class="l">استيريو</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--purple)">${fmt.atmos}</div><div class="l">Atmos</div></div>
+      <div class="stat" style="cursor:default"><div class="n" style="color:var(--gold)">${fmt.fiveOne}</div><div class="l">5.1</div></div>
+    </div>`;
+  }
   const mr = DATA.masterReport;
   if(!mr){
     el.innerHTML = '<p class="meta-foot">—</p>';

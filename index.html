@@ -19,6 +19,7 @@
   .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 14px;font-size:.78rem;color:var(--mut);text-align:center}
   .stat b{display:block;font-size:1.15rem}
   .s-ok b{color:var(--ok)}.s-warn b{color:var(--warn)}.s-bad b{color:var(--bad)}.s-day b{color:var(--cyan)}
+  .s-stereo b{color:var(--cyan)}.s-atmos b{color:var(--purple)}.s-51 b{color:var(--gold)}
   nav{display:flex;gap:6px;padding:14px 22px 0;flex-wrap:wrap}
   nav button{background:var(--card);color:var(--mut);border:1px solid var(--line);border-bottom:none;border-radius:10px 10px 0 0;padding:10px 18px;cursor:pointer;font-size:.92rem}
   nav button.active{background:var(--navy2);color:var(--gold);border-color:var(--gold)}
@@ -84,6 +85,9 @@
     <div class="stat s-ok"><b id="stReady">0</b>جاهز للتحكيم</div>
     <div class="stat s-warn"><b id="stActive">0</b>قيد التنفيذ</div>
     <div class="stat s-bad"><b id="stShoot">0</b>تصوير غير مكتمل</div>
+    <div class="stat s-stereo"><b id="stStereo">0</b>استيريو</div>
+    <div class="stat s-atmos"><b id="stAtmos">0</b>Atmos</div>
+    <div class="stat s-51"><b id="st51">0</b>5.1</div>
   </div>
 </header>
 
@@ -217,7 +221,12 @@
         <option value="6">جاهز للتحكيم ✔</option>
       </select>
       <label>صيغة الـ Master (اختياري)</label>
-      <input id="cMaster" placeholder="مثال: Atmos / استيريو / 5.1">
+      <select id="cMaster">
+        <option value="">— غير محدد —</option>
+        <option value="استيريو">استيريو (Stereo)</option>
+        <option value="Atmos">Atmos</option>
+        <option value="5.1">5.1</option>
+      </select>
       <label>ملاحظات</label>
       <textarea id="cNote" rows="2" placeholder="مثال: تم عمل Master اليوم"></textarea>
       <label>عدد الأفلام الجاهزة للتحكيم (يشمل خارج الـ22)</label>
@@ -243,7 +252,8 @@ const CONFIG = {
 
 const DEFAULT_META = {
   readyForJury: 8,
-  externalReady: [{name: "انت فين", format: "استيريو"}]
+  externalReady: [{name: "انت فين", format: "استيريو"}],
+  externalFormats: [{name: "قدر من حبر", format: "5.1"}]
 };
 
 const SLOTS = [
@@ -453,11 +463,41 @@ function juryReadyCount(){
   return DATA.projects.filter(p=>p.idx>=6).length + ext;
 }
 
+function normalizeMasterFormat(raw){
+  const s = String(raw || "").trim().toLowerCase().replace(/\s+/g,"");
+  if(!s) return null;
+  if(s.includes("atmos")) return "Atmos";
+  if(s.includes("5.1") || s.includes("5,1") || s==="51") return "5.1";
+  if(s.includes("stereo") || s.includes("استيريو") || s.includes("ستيريو") || s.includes("استريو")) return "استيريو";
+  return null;
+}
+
+function countMasterFormats(){
+  const counts = {stereo:0, atmos:0, fiveOne:0};
+  const bump = (fmt)=>{
+    const n = normalizeMasterFormat(fmt);
+    if(n==="Atmos") counts.atmos++;
+    else if(n==="5.1") counts.fiveOne++;
+    else if(n==="استيريو") counts.stereo++;
+  };
+  DATA.projects.forEach(p=> bump(p.master || p.masterFormat));
+  (DATA.meta?.externalReady || []).forEach(x=> bump(x.format));
+  (DATA.meta?.externalFormats || []).forEach(x=>{
+    const already = (DATA.meta?.externalReady || []).some(e=>e.name===x.name);
+    if(!already) bump(x.format);
+  });
+  return counts;
+}
+
 function renderStats(){
   $("#stReady").textContent = juryReadyCount();
   $("#stActive").textContent = DATA.projects.filter(p=>p.shot && p.idx>0 && p.idx<6).length;
   $("#stShoot").textContent = DATA.projects.filter(p=>!p.shot).length;
   $("#days").textContent = Math.max(0, Math.ceil((new Date(CONFIG.JURY_DATE)-new Date())/864e5));
+  const fmt = countMasterFormats();
+  $("#stStereo").textContent = fmt.stereo;
+  $("#stAtmos").textContent = fmt.atmos;
+  $("#st51").textContent = fmt.fiveOne;
   const rc = $("#cReadyCount");
   if(rc && DATA.meta?.readyForJury != null) rc.value = DATA.meta.readyForJury;
 }
@@ -501,7 +541,7 @@ function syncCommitteeForm(){
   const p = DATA.projects.find(x=>x.id===+el.value);
   if(!p) return;
   $("#cStage").value = String(p.idx ?? 0);
-  $("#cMaster").value = p.master || "";
+  $("#cMaster").value = normalizeMasterFormat(p.master || p.masterFormat) || "";
   $("#cNote").value = p.committeeNote || p.notes || "";
 }
 $("#cProject")?.addEventListener("change", syncCommitteeForm);
