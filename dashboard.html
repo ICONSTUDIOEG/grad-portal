@@ -145,6 +145,13 @@
     <p class="meta-foot" id="filterCount"></p>
   </div>
 
+  <div class="card">
+    <h2>🎚️ أسماء الأفلام حسب صيغة الـ Master</h2>
+    <div id="masterFormatKpis" style="margin-bottom:12px"></div>
+    <div id="masterFormatLists" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px"></div>
+    <div id="masterReport"></div>
+  </div>
+
   <div class="grid2">
     <div class="card">
       <h2>تقرير قسم الصوت</h2>
@@ -153,9 +160,6 @@
       <div id="noEngineer"></div>
       <h3>مكساج مكتمل</h3>
       <div id="mixDone"></div>
-      <h3>Master Files</h3>
-      <div id="masterFormatKpis" style="margin-bottom:12px"></div>
-      <div id="masterReport"></div>
     </div>
     <div class="card">
       <h2>التصحيحات المُطبَّقة</h2>
@@ -201,7 +205,14 @@ function readinessChip(r){
 
 function applyPortalState(state){
   if(!state) return;
-  if(state.meta) DATA.meta = {...DATA.meta, ...state.meta};
+  if(state.meta){
+    DATA.meta = {
+      ...DATA.meta,
+      ...state.meta,
+      externalReady: state.meta.externalReady || DATA.meta.externalReady,
+      externalFormats: state.meta.externalFormats || DATA.meta.externalFormats || [{name:"قدر من حبر", format:"5.1"}]
+    };
+  }
   const portal = state.projects;
   if(!Array.isArray(portal) || !portal.length) return;
   portal.forEach(sp=>{
@@ -416,30 +427,44 @@ function normalizeMasterFormat(raw){
   return null;
 }
 
-function countMasterFormats(){
-  const counts = {stereo:0, atmos:0, fiveOne:0};
-  const bump = (fmt)=>{
+function masterFormatEntries(){
+  const seen = new Set();
+  const out = {stereo:[], atmos:[], fiveOne:[]};
+  const add = (name, fmt, extra="")=>{
     const n = normalizeMasterFormat(fmt);
-    if(n==="Atmos") counts.atmos++;
-    else if(n==="5.1") counts.fiveOne++;
-    else if(n==="استيريو") counts.stereo++;
+    if(!n || !name) return;
+    const key = n+"|"+name;
+    if(seen.has(key)) return;
+    seen.add(key);
+    const label = extra ? `${name} (${extra})` : name;
+    if(n==="Atmos") out.atmos.push(label);
+    else if(n==="5.1") out.fiveOne.push(label);
+    else if(n==="استيريو") out.stereo.push(label);
   };
   (DATA.projects||[]).forEach(p=>{
-    if(p.masterDone || p.masterFormat || p.master) bump(p.masterFormat || p.master);
+    if(p.masterDone || p.masterFormat || p.master)
+      add(p.name || p.t, p.masterFormat || p.master, p.id ? "#"+p.id : "");
   });
-  (DATA.meta?.externalReady||[]).forEach(x=> bump(x.format));
+  (DATA.meta?.externalReady||[]).forEach(x=> add(x.name, x.format, "خارج الـ22"));
+  (DATA.meta?.externalFormats||[]).forEach(x=> add(x.name, x.format, "خارج الـ22"));
   (DATA.masterReport?.external||[]).forEach(x=>{
-    // avoid double-count if already in externalReady
-    const already = (DATA.meta?.externalReady||[]).some(e=>e.name===x.name);
-    if(!already) bump(x.format);
+    const already = (DATA.meta?.externalReady||[]).some(e=>e.name===x.name)
+      || (DATA.meta?.externalFormats||[]).some(e=>e.name===x.name);
+    if(!already) add(x.name, x.format, "خارج الـ22");
   });
-  return counts;
+  return out;
+}
+
+function countMasterFormats(){
+  const e = masterFormatEntries();
+  return {stereo:e.stereo.length, atmos:e.atmos.length, fiveOne:e.fiveOne.length};
 }
 
 function renderMasterReport(){
   const el = $("#masterReport");
   if(!el) return;
-  const fmt = countMasterFormats();
+  const e = masterFormatEntries();
+  const fmt = {stereo:e.stereo.length, atmos:e.atmos.length, fiveOne:e.fiveOne.length};
   const top = $("#formatStatCards");
   if(top){
     top.innerHTML = `
@@ -455,9 +480,21 @@ function renderMasterReport(){
       <div class="stat" style="cursor:default"><div class="n" style="color:var(--gold)">${fmt.fiveOne}</div><div class="l">5.1</div></div>
     </div>`;
   }
+  const lists = $("#masterFormatLists");
+  if(lists){
+    const block = (title, items, color)=>`
+      <div style="background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:14px">
+        <div style="color:${color};font-weight:700;margin-bottom:8px">${title} (${items.length})</div>
+        ${items.length ? `<ol style="margin:0;padding-right:20px;line-height:1.9;font-size:.85rem">${items.map(n=>`<li>${n}</li>`).join("")}</ol>` : `<span class="meta-foot">لا يوجد بعد</span>`}
+      </div>`;
+    lists.innerHTML =
+      block("استيريو", e.stereo, "var(--cyan)") +
+      block("Atmos", e.atmos, "var(--purple)") +
+      block("5.1", e.fiveOne, "var(--gold)");
+  }
   const mr = DATA.masterReport;
   if(!mr){
-    el.innerHTML = '<p class="meta-foot">—</p>';
+    el.innerHTML = "";
     return;
   }
   let html = "";
@@ -466,24 +503,7 @@ function renderMasterReport(){
     const inTable = (mr.completed||[]).length;
     html += `<p class="meta-foot" style="color:var(--ok);margin-bottom:10px"><b>${DATA.meta?.readyForJury || mr.totalReady} أفلام جاهزة للتحكيم</b> (${inTable} في الجدول + ${ext} خارج الجدول)</p>`;
   }
-  if(mr.completedToday?.length){
-    html += `<h3 style="margin:8px 0 4px;font-size:.85rem;color:var(--gold)">تم اليوم ٦/٧</h3>`;
-    html += mr.completedToday.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.id?"#"+x.id+" ":""}${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
-  }
-  if(mr.completedYesterday?.length){
-    html += `<h3 style="margin:12px 0 4px;font-size:.85rem;color:var(--gold)">تم أمس ٥/٧</h3>`;
-    html += mr.completedYesterday.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id} ${x.name}</span><span class="cnt">${chip(x.format+" ✔","c-ok")}</span></div>`).join("");
-  }
-  if(mr.completed?.length){
-    html += `<h3 style="margin:12px 0 4px;font-size:.85rem;color:var(--mut)">كل الـ Master المكتمل</h3>`;
-    html += mr.completed.map(x=>`<div class="bar-row" style="margin-bottom:6px"><span class="lbl">#${x.id} ${x.name}</span><span class="cnt">${chip(x.format,"c-info")}</span></div>`).join("");
-  }
-  (mr.external||[]).forEach(x=>{
-    const cls = x.status==="ready_for_jury" ? "c-ok" : "c-info";
-    const suffix = x.status==="ready_for_jury" ? " ✔" : "";
-    html += `<div class="bar-row" style="margin-bottom:6px"><span class="lbl">${x.name}</span><span class="cnt">${chip(x.format+suffix+" — "+x.note, cls)}</span></div>`;
-  });
-  el.innerHTML = html || '<p class="meta-foot">—</p>';
+  el.innerHTML = html;
 }
 
 function renderFixes(){

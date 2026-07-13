@@ -93,6 +93,7 @@
 
 <nav>
   <button class="active" data-p="projects">📋 المشاريع</button>
+  <button data-p="formats">🎚️ صيغ Master</button>
   <button data-p="update">✏️ تحديث مرحلة</button>
   <button data-p="booking">🎙️ حجز استوديو الفولي</button>
   <button data-p="board">👨‍🏫 لوحة الإشراف</button>
@@ -121,20 +122,25 @@
         </table>
       </div>
       <p class="note">مسار الاعتماد الإجباري: تصوير ← مونتاج ← الفولي ← مراجعة استيريو ← المكساج النهائي (دولبي) ← DCP ← جاهز للتحكيم. لا يُسمح بتخطي مرحلة.</p>
-    </div>
-    <div class="card" id="formatCard">
-      <h3>🎚️ توزيع صيغ الـ Master</h3>
-      <div class="hstats" style="margin:10px 0 12px">
-        <div class="stat s-stereo"><b id="fmtStereo">0</b>استيريو</div>
-        <div class="stat s-atmos"><b id="fmtAtmos">0</b>Atmos</div>
-        <div class="stat s-51"><b id="fmt51">0</b>5.1</div>
-      </div>
-      <div id="formatLists" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-size:.82rem"></div>
+      <p class="note">👉 لأسماء الأفلام حسب الصيغة افتح تبويب <b>صيغ Master</b>.</p>
     </div>
     <div class="card" id="staffContacts">
       <h3>📞 تواصل فريق اللجنة</h3>
       <p class="note" id="contactsSubtitle" style="margin-top:0;margin-bottom:12px"></p>
       <div class="contact-grid" id="contactGrid"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-formats">
+    <div class="card">
+      <h3>🎚️ أسماء الأفلام حسب صيغة الـ Master</h3>
+      <p class="note" style="margin-top:0;margin-bottom:12px">كل صيغة لوحدها — العدد يتحدّث تلقائيًا عند حفظ Master من تبويب تحديث اللجنة.</p>
+      <div class="hstats" style="margin:10px 0 14px">
+        <div class="stat s-stereo"><b id="fmtStereo">0</b>استيريو</div>
+        <div class="stat s-atmos"><b id="fmtAtmos">0</b>Atmos</div>
+        <div class="stat s-51"><b id="fmt51">0</b>5.1</div>
+      </div>
+      <div id="formatLists" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;font-size:.9rem"></div>
     </div>
   </section>
 
@@ -502,7 +508,7 @@ function masterFormatEntries(){
     else if(n==="5.1") out.fiveOne.push(label);
     else if(n==="استيريو") out.stereo.push(label);
   };
-  DATA.projects.forEach(p=> add(p.t, p.master || p.masterFormat));
+  DATA.projects.forEach(p=> add(p.t, p.master || p.masterFormat, p.id ? "#"+p.id : ""));
   (DATA.meta?.externalReady || []).forEach(x=> add(x.name, x.format, "خارج الـ22"));
   (DATA.meta?.externalFormats || []).forEach(x=> add(x.name, x.format, "خارج الـ22"));
   return out;
@@ -526,9 +532,9 @@ function renderFormatBreakdown(){
   const lists = $("#formatLists");
   if(!lists) return;
   const block = (title, items, color)=>`
-    <div style="background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:12px">
-      <div style="color:${color};font-weight:700;margin-bottom:8px">${title} — ${items.length}</div>
-      ${items.length ? `<ul style="margin:0;padding-right:18px;line-height:1.8;color:var(--mut)">${items.map(n=>`<li>${n}</li>`).join("")}</ul>` : `<span style="color:var(--mut)">لا يوجد بعد</span>`}
+    <div style="background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:16px">
+      <div style="color:${color};font-weight:700;font-size:1.05rem;margin-bottom:10px">${title} <span style="opacity:.85">(${items.length})</span></div>
+      ${items.length ? `<ol style="margin:0;padding-right:22px;line-height:2;color:var(--txt)">${items.map(n=>`<li>${n}</li>`).join("")}</ol>` : `<span style="color:var(--mut)">لا يوجد أفلام بهذه الصيغة بعد</span>`}
     </div>`;
   lists.innerHTML =
     block("استيريو", e.stereo, "var(--cyan)") +
@@ -604,6 +610,7 @@ $("#cSave")?.addEventListener("click", async ()=>{
   if(note) p.committeeNote = note;
   DATA.meta.readyForJury = +$("#cReadyCount").value || juryReadyCount();
   DATA.meta.externalReady = DEFAULT_META.externalReady;
+  DATA.meta.externalFormats = DEFAULT_META.externalFormats;
   DATA.meta.lastEdit = {by: $("#cName").value.trim(), at: new Date().toISOString()};
   try{
     await saveState();
